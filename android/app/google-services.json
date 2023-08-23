@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "620410041676",
+    "project_id": "fantasy-bet-18af4",
+    "storage_bucket": "fantasy-bet-18af4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620410041676:android:3629b3e9db7cce0a9ccbe9",
+        "android_client_info": {
+          "package_name": "com.plfantasyadmin.online.pl_fantasy_online_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620410041676-2ve52fmstpfh8j701002cgekigei2q9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrOWtn2yFJXIM92ax2ErnNtveL6DEmdf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620410041676-2ve52fmstpfh8j701002cgekigei2q9c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "620410041676-bbapha271guskt4v33ksc4dnan0to1m7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fantasybet.online"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620410041676:android:017566c876617a009ccbe9",
+        "android_client_info": {
+          "package_name": "com.plfo.pl_fantasy_online"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620410041676-n5ep14iht55ktkvetp23049rm1snfui8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.plfo.pl_fantasy_online",
+            "certificate_hash": "b84afc2bdb548ea1cc7c868d7627baa94100a697"
+          }
+        },
+        {
+          "client_id": "620410041676-2ve52fmstpfh8j701002cgekigei2q9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrOWtn2yFJXIM92ax2ErnNtveL6DEmdf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620410041676-2ve52fmstpfh8j701002cgekigei2q9c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "620410041676-bbapha271guskt4v33ksc4dnan0to1m7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fantasybet.online"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
