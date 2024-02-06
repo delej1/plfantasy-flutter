@@ -82,5 +82,5 @@ class AppConstants{
   static String adminPhoneNumber = adminNum;
   static String shareLinkIOS = iosLink;
   static String shareLinkAndroid = androidLink;
-  static String showImgData = showData;
+  //static String showImgData = showData;
 }

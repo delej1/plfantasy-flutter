@@ -6,7 +6,7 @@ import 'package:pl_fantasy_online/base/custom_app_bar.dart';
 import 'package:pl_fantasy_online/base/custom_snack_bar.dart';
 import 'package:pl_fantasy_online/controllers/auth_controller.dart';
 import 'package:pl_fantasy_online/controllers/bank_list_controller.dart';
-import 'package:pl_fantasy_online/utils/app_constants.dart';
+//import 'package:pl_fantasy_online/utils/app_constants.dart';
 import 'package:pl_fantasy_online/utils/colors.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 import 'package:pl_fantasy_online/widgets/app_icon.dart';
@@ -235,7 +235,7 @@ class _AccountPageState extends State<AccountPage>{
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontSize: Dimensions.font14, color: Colors.white)),),
                           //bank account
-                          if (tokenBalance != "0" && approved && AppConstants.redeemTextString == "Redeem Tokens") Stack(
+                          if (tokenBalance != "0" && approved /*&& AppConstants.redeemTextString == "Redeem Tokens"*/) Stack(
                             alignment: Alignment.centerRight,
                             children: [
                               ProfileWidget(

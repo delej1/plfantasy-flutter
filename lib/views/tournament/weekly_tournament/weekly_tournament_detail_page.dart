@@ -139,6 +139,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
   late bool isPaidOut;
 
   late String tournamentName;
+  late bool approved;
 
   Future<void> firebaseGetData() async {
     await db.collection("user_teams").doc(auth.currentUser!.uid).get().then((data) {
@@ -170,6 +171,12 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
     }catch(_){showCustomSnackBar(title: "Error", "Something went wrong, refresh page.");}
   }
 
+  void firebaseGetApproveData() async {
+    await db.collection("user_data").doc(auth.currentUser!.uid).get().then((data){
+      approved = data["approved"];
+    });
+  }
+
   void getGameWeekAndStatus() {
     idList = generalController.generalModel?.elements!.map((info) => info.id).toList();
     playerPointList = generalController.generalModel?.elements!.map((info) => info.eventPoints).toList();
@@ -184,6 +191,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
     super.initState();
     firebaseGetData();
     getGameWeekAndStatus();
+    firebaseGetApproveData();
 
     _tokenStream = db.collection("user_data").doc(auth.currentUser?.uid).snapshots();
 
@@ -194,6 +202,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
     isPaidOut = tournament[10];
     
     winners = {};
+    approved = false;
   }
 
   @override
@@ -959,7 +968,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                           child: Image.asset(
                             'assets/image/field.png', fit: BoxFit.fill,),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png',
                           name: gkName ?? "--",
                           top: 0.07272727 * fieldH,
                           right: 0.0,
@@ -978,7 +987,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png',
                           name: rbName ?? "--",
                           top: 0.21818182 * fieldH,
                           right: 0.70666667 * width,
@@ -997,7 +1006,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png',
                           name: rCbName ?? "--",
                           top: 0.23636364 * fieldH,
                           right: 0.29333333 * width,
@@ -1016,7 +1025,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png',
                           name: lCbName ?? "--",
                           top: 0.23636364 * fieldH,
                           right: 0.0,
@@ -1035,7 +1044,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png',
                           name: lbName ?? "--",
                           top: 0.21818182 * fieldH,
                           right: 0.0,
@@ -1054,7 +1063,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png',
                           name: rMdName ?? "--",
                           top: 0.47272727 * fieldH,
                           right: 0.0,
@@ -1073,7 +1082,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png',
                           name: mdName ?? "--",
                           top: 0.44454545 * fieldH,
                           right: 0.01333333 * width,
@@ -1092,7 +1101,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png',
                           name: lMdName ?? "--",
                           top: 0.47272727 * fieldH,
                           right: 0.70666667 * width,
@@ -1111,7 +1120,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png',
                           name: rFwdName ?? "--",
                           top: 0.68090909 * fieldH,
                           right: 0.29333333 * width,
@@ -1130,7 +1139,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png',
                           name: fwdName ?? "--",
                           top: 0.68090909 * fieldH,
                           right: 0.5 * width,
@@ -1149,7 +1158,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             height: Dimensions.height10,)
                               : Container(),),
                         Player(
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png',
                           name: lFwdName ?? "--",
                           top: 0.68090909 * fieldH,
                           right: 0.1 * width,
@@ -1186,7 +1195,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             SizedBox(
                                 width: width * 0.25,
                                 child: SubPlayer(
-                                  image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png',
+                                  image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png',
                                   name: gkSubName ?? "--",
                                   position: "DEF",
                                   points: gkSubPoints ?? 0,)),
@@ -1194,7 +1203,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             SizedBox(
                                 width: width * 0.25,
                                 child: SubPlayer(
-                                  image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png',
+                                  image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png',
                                   name: defSubName ?? "--",
                                   position: "DEF",
                                   points: defSubPoints ?? 0,)),
@@ -1202,7 +1211,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             SizedBox(
                                 width: width * 0.25,
                                 child: SubPlayer(
-                                  image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png',
+                                  image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png',
                                   name: midSubName ?? "--",
                                   position: "MID",
                                   points: midSubPoints ?? 0,)),
@@ -1210,7 +1219,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                             SizedBox(
                                 width: width * 0.25,
                                 child: SubPlayer(
-                                  image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png',
+                                  image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png',
                                   name: fwdSubName ?? "--",
                                   position: "FWD",
                                   points: fwdSubPoints ?? 0,)),

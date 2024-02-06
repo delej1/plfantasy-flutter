@@ -7,7 +7,7 @@ import 'package:pl_fantasy_online/base/custom_snack_bar.dart';
 import 'package:pl_fantasy_online/controllers/general_controller.dart';
 import 'package:pl_fantasy_online/controllers/picks_controller.dart';
 import 'package:pl_fantasy_online/helpers/route_helper.dart';
-import 'package:pl_fantasy_online/utils/app_constants.dart';
+//import 'package:pl_fantasy_online/utils/app_constants.dart';
 import 'package:pl_fantasy_online/utils/colors.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 import 'package:pl_fantasy_online/widgets/app_text_field.dart';
@@ -50,6 +50,7 @@ class _CreateTeamState extends State<CreateTeam> {
   late String name;
   late String phone;
   late String fplId;
+  late bool approved;
 
   final FirebaseFirestore db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -73,6 +74,7 @@ class _CreateTeamState extends State<CreateTeam> {
       name = data["name"];
       phone = data["phone"];
       fplId = data["fpl_id"];
+      approved = data["approved"];
     });
   }
 
@@ -91,6 +93,11 @@ class _CreateTeamState extends State<CreateTeam> {
 
     _userTeamStream = db.collection("user_teams").doc(auth.currentUser?.uid).snapshots();
     teamNameController.text = "";
+
+    name = "";
+    phone = "";
+    fplId = "";
+    approved = false;
   }
 
   @override
@@ -403,49 +410,49 @@ class _CreateTeamState extends State<CreateTeam> {
                                           width: width,
                                           child: Image.asset('assets/image/field.png', fit: BoxFit.fill,),),
                                         gkData==0?CreatePlayer(image: 'assets/image/jersey_gk.png', top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png', name: gk??"--", top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK", points: null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk", gkPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png', name: gk??"--", top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK", points: null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk", gkPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         rbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rb", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png', name: rb??"--", top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rb", rbPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rb", selectedPlayers, approved]);},):
+                                        Player(image:!approved /*&&  AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png', name: rb??"--", top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rb", rbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         rcbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rcb", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png', name: rCb??"--", top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rcb", rCbPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rcb", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png', name: rCb??"--", top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rcb", rCbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         lcbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lcb", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png', name: lCb??"--", top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lcb", lCbPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lcb", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png', name: lCb??"--", top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lcb", lCbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         lbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lb", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png', name: lb??"--", top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lb", lbPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lb", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png', name: lb??"--", top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lb", lbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         rmdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "rmd", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png', name: rMd??"--", top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "rmd", rMdPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "rmd", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png', name: rMd??"--", top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "rmd", rMdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         mdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "md", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png', name: md??"--", top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "md", mdPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "md", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png', name: md??"--", top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "md", mdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         lmdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "lmd", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png', name: lMd??"--", top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "lmd", lMdPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "lmd", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png', name: lMd??"--", top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "lmd", lMdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         rfwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "rfwd", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png', name: rFwd??"--", top: 0.69090909 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "rfwd", rFwdPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "rfwd", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png', name: rFwd??"--", top: 0.69090909 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "rfwd", rFwdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         fwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png', name: fwd??"--", top: 0.69090909 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd", fwdPrice, selectedPlayers]);}, captainBand: Container(),),
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png', name: fwd??"--", top: 0.69090909 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd", fwdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
                                         lfwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "lfwd", selectedPlayers]);},):
-                                        Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png', name: lFwd??"--", top: 0.69090909 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "lfwd", lFwdPrice, selectedPlayers]);}, captainBand: Container(),)
+                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "lfwd", selectedPlayers, approved]);},):
+                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png', name: lFwd??"--", top: 0.69090909 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF", points:null,
+                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "lfwd", lFwdPrice, selectedPlayers, approved]);}, captainBand: Container(),)
                                       ]),
                                   Container(
                                     width: width,
@@ -465,33 +472,33 @@ class _CreateTeamState extends State<CreateTeam> {
                                             SizedBox(
                                               width: width*0.25,
                                               child: gkSubData==0?SubCreatePlayer(image: 'assets/image/jersey_gk.png', position: "DEF",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk_sub", selectedPlayers]);},):
-                                              SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png', name: gkSub??"--", position: "DEF", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk_sub", gkSubPrice, selectedPlayers]);},),
+                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk_sub", selectedPlayers, approved]);},):
+                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png', name: gkSub??"--", position: "DEF", points:null,
+                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk_sub", gkSubPrice, selectedPlayers, approved]);},),
                                             ),
                                             SizedBox(width: Dimensions.width5,),
                                             SizedBox(
                                               width: width*0.25,
                                               child: defSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "DEF",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "def_sub", selectedPlayers]);},):
-                                              SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png', name: defSub??"--", position: "DEF", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "def_sub", defSubPrice, selectedPlayers]);},),
+                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "def_sub", selectedPlayers, approved]);},):
+                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png', name: defSub??"--", position: "DEF", points:null,
+                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "def_sub", defSubPrice, selectedPlayers, approved]);},),
                                             ),
                                             SizedBox(width: Dimensions.width5,),
                                             SizedBox(
                                               width: width*0.25,
                                               child: midSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "MID",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "mid_sub", selectedPlayers]);},):
-                                              SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png', name: midSub??"--", position: "MID", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "mid_sub", midSubPrice, selectedPlayers]);},),
+                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "mid_sub", selectedPlayers, approved]);},):
+                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png', name: midSub??"--", position: "MID", points:null,
+                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "mid_sub", midSubPrice, selectedPlayers, approved]);},),
                                             ),
                                             SizedBox(width: Dimensions.width5,),
                                             SizedBox(
                                               width: width*0.25,
                                               child: fwdSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "FWD",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd_sub", selectedPlayers]);},):
-                                              SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png', name: fwdSub??"--", position: "FWD", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd_sub", fwdSubPrice, selectedPlayers]);},),
+                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd_sub", selectedPlayers, approved]);},):
+                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png', name: fwdSub??"--", position: "FWD", points:null,
+                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd_sub", fwdSubPrice, selectedPlayers, approved]);},),
                                             ),
                                           ],
                                         ),

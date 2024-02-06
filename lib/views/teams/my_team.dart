@@ -6,7 +6,7 @@ import 'package:pl_fantasy_online/base/custom_app_bar.dart';
 import 'package:pl_fantasy_online/base/custom_snack_bar.dart';
 import 'package:pl_fantasy_online/controllers/event_status_controller.dart';
 import 'package:pl_fantasy_online/controllers/general_controller.dart';
-import 'package:pl_fantasy_online/utils/app_constants.dart';
+//import 'package:pl_fantasy_online/utils/app_constants.dart';
 import 'package:pl_fantasy_online/utils/colors.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 import 'package:pl_fantasy_online/widgets/player.dart';
@@ -49,14 +49,24 @@ class _MyTeamState extends State<MyTeam> {
 
   late Stream<DocumentSnapshot> _userTeamStream;
   bool isLoaded = false;
+  late bool approved;
 
   GeneralController generalController = Get.put(GeneralController());
   EventStatusController eventStatusController = Get.put(EventStatusController());
+
+  void firebaseGetData() async {
+    await db.collection("user_data").doc(auth.currentUser!.uid).get().then((data){
+      approved = data["approved"];
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _userTeamStream = db.collection("user_teams").doc(auth.currentUser?.uid).snapshots();
+    firebaseGetData();
+
+    approved = false;
   }
 
   @override
@@ -254,27 +264,27 @@ class _MyTeamState extends State<MyTeam> {
                                     height: fieldH,
                                     width: width,
                                     child: Image.asset('assets/image/field.png', fit: BoxFit.fill,),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png', name: gkName??"--", top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK", points: gkPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png', name: gkName??"--", top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK", points: gkPoints??0,
                                     onTap: (){showSubCaptainDialogue(gkInt, "gk", "gk_sub", gkSubInt);}, captainBand: captain==gkInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png', name: rbName??"--", top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB", points: rbPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png', name: rbName??"--", top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB", points: rbPoints??0,
                                     onTap: (){showSubCaptainDialogue(rbInt, "rb", "def_sub", defSubInt);}, captainBand: captain==rbInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png', name: rCbName??"--", top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB", points: rCbPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png', name: rCbName??"--", top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB", points: rCbPoints??0,
                                     onTap: (){showSubCaptainDialogue(rCbInt, "rcb", "def_sub", defSubInt);}, captainBand: captain==rCbInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png', name: lCbName??"--", top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB", points: lCbPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png', name: lCbName??"--", top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB", points: lCbPoints??0,
                                     onTap: (){showSubCaptainDialogue(lCbInt, "lcb", "def_sub", defSubInt);}, captainBand: captain==lCbInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png', name: lbName??"--", top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB", points: lbPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png', name: lbName??"--", top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB", points: lbPoints??0,
                                     onTap: (){showSubCaptainDialogue(lbInt, "lb", "def_sub", defSubInt);}, captainBand: captain==lbInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png', name: rMdName??"--", top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF", points: rMdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png', name: rMdName??"--", top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF", points: rMdPoints??0,
                                     onTap: (){showSubCaptainDialogue(rMidInt, "rmd", "mid_sub", midSubInt);}, captainBand: captain==rMidInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png', name: mdName??"--", top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF", points: mdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png', name: mdName??"--", top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF", points: mdPoints??0,
                                     onTap: (){showSubCaptainDialogue(midInt, "md", "mid_sub", midSubInt);}, captainBand: captain==midInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png', name: lMdName??"--", top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF", points: lMdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png', name: lMdName??"--", top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF", points: lMdPoints??0,
                                     onTap: (){showSubCaptainDialogue(lMidInt, "lmd", "mid_sub", midSubInt);}, captainBand: captain==lMidInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png', name: rFwdName??"--", top: 0.71 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF", points: rFwdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png', name: rFwdName??"--", top: 0.71 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF", points: rFwdPoints??0,
                                     onTap: (){showSubCaptainDialogue(rFwdInt, "rfwd", "fwd_sub", fwdSubInt);}, captainBand: captain==rFwdInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png', name: fwdName??"--", top: 0.71 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF", points: fwdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png', name: fwdName??"--", top: 0.71 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF", points: fwdPoints??0,
                                     onTap: (){showSubCaptainDialogue(fwdInt, "fwd", "fwd_sub", fwdSubInt);}, captainBand: captain==fwdInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),),
-                                  Player(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png', name: lFwdName??"--", top: 0.71 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF", points: lFwdPoints??0,
+                                  Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png', name: lFwdName??"--", top: 0.71 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF", points: lFwdPoints??0,
                                     onTap: (){showSubCaptainDialogue(lFwdInt, "lfwd", "fwd_sub", fwdSubInt);}, captainBand: captain==lFwdInt&&captain!=0?Image.asset("assets/image/captain_img.png", height: Dimensions.height10,):Container(),)
                                 ]),
                             Container(
@@ -294,19 +304,19 @@ class _MyTeamState extends State<MyTeam> {
                                     children: [
                                       SizedBox(
                                           width: width*0.25,
-                                          child: SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png', name: gkSubName??"--", position: "DEF", points: gkSubPoints??0,)),
+                                          child: SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png', name: gkSubName??"--", position: "DEF", points: gkSubPoints??0,)),
                                       SizedBox(width: Dimensions.width5,),
                                       SizedBox(
                                           width: width*0.25,
-                                          child: SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png', name: defSubName??"--", position: "DEF", points: defSubPoints??0,)),
+                                          child: SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png', name: defSubName??"--", position: "DEF", points: defSubPoints??0,)),
                                       SizedBox(width: Dimensions.width5,),
                                       SizedBox(
                                           width: width*0.25,
-                                          child: SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png', name: midSubName??"--", position: "MID", points: midSubPoints??0,)),
+                                          child: SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png', name: midSubName??"--", position: "MID", points: midSubPoints??0,)),
                                       SizedBox(width: Dimensions.width5,),
                                       SizedBox(
                                           width: width*0.25,
-                                          child: SubPlayer(image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png', name: fwdSubName??"--", position: "FWD", points: fwdSubPoints??0,)),
+                                          child: SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png', name: fwdSubName??"--", position: "FWD", points: fwdSubPoints??0,)),
                                     ],
                                   ),
                                 ),

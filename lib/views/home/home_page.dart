@@ -96,7 +96,10 @@ class _HomePageState extends State<HomePage> {
           "PL Fantasy Online", "PL Fantasy Online", importance: Importance.high,
         styleInformation: bigTextStyleInformation, priority: Priority.high, playSound: true,
       );
-      NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
+      DarwinNotificationDetails darwinNotificationDetails = const DarwinNotificationDetails(
+        presentAlert: true, presentBadge: true, presentSound: true, badgeNumber: 1
+      );
+      NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails, iOS: darwinNotificationDetails);
       await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
           message.notification?.body, notificationDetails,
           payload: message.data['body']);

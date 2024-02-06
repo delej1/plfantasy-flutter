@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:pl_fantasy_online/base/custom_app_bar.dart';
 import 'package:pl_fantasy_online/base/custom_snack_bar.dart';
 import 'package:pl_fantasy_online/controllers/general_controller.dart';
-import 'package:pl_fantasy_online/utils/app_constants.dart';
+//import 'package:pl_fantasy_online/utils/app_constants.dart';
 import 'package:pl_fantasy_online/utils/colors.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 import 'package:pl_fantasy_online/widgets/select_player_card.dart';
@@ -20,7 +20,7 @@ class EditTeamPage extends StatefulWidget {
 
 class _EditTeamPageState extends State<EditTeamPage> {
 
-  final FirebaseFirestore db = FirebaseFirestore.instance;
+  //final FirebaseFirestore db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
 
   List<dynamic> team = Get.arguments;
@@ -37,6 +37,8 @@ class _EditTeamPageState extends State<EditTeamPage> {
   List<String?>? playerStatus;
   List selectedPlayerPosition = [];
   List selectedPlayers = [];
+
+  bool approved = false;
   late bool isPlayerSelected;
 
   GeneralController generalController = Get.put(GeneralController());
@@ -73,6 +75,7 @@ class _EditTeamPageState extends State<EditTeamPage> {
     }
 
     selectedPlayers = team[5];
+    approved = team[6];
 
     return Container(
         decoration: const BoxDecoration(
@@ -146,7 +149,7 @@ class _EditTeamPageState extends State<EditTeamPage> {
                           player: webNameMap[selectedPlayerPosition[index]],
                           team: teamNameMap[playerTeamMap[selectedPlayerPosition[index]]],
                           price: playerPriceMap[selectedPlayerPosition[index]],
-                          image: AppConstants.showImgData!="true"?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p${photoMap[selectedPlayerPosition[index]]}.png',
+                          image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p${photoMap[selectedPlayerPosition[index]]}.png',
                           onPressed: () {
                             showConfirmDialogue(
                               webNameMap[selectedPlayerPosition[index]],

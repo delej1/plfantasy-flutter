@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -162,7 +161,7 @@ class _WeeklyTournamentsPageState extends State<WeeklyTournamentsPage> {
               data!=null&&data.isNotEmpty?GridView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: data.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.9),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1, childAspectRatio: 3),
                   itemBuilder: (context, index){
 
                     Map players = data[index]['players'];
@@ -199,174 +198,184 @@ class _WeeklyTournamentsPageState extends State<WeeklyTournamentsPage> {
                                 pot, players, createdAt, createdBy, key, tournamentId, adminId, isPaidOut]);
                         }
                       },
-                      child: Container(
-                        margin: EdgeInsets.only(left: Dimensions.width5, right: Dimensions.width5, top: Dimensions.height20),
-                        decoration: BoxDecoration(
-                          color: Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(Dimensions.width10),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(Dimensions.width15),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //tournament name
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width*0.40,
-                                child: Text(data[index]['name'],
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: Dimensions.font16,
-                                      fontWeight: FontWeight.bold,
-                                  ),),
-                              ),
-                              SizedBox(height: Dimensions.height30,),
-                              //week
-                              Row(
-                                children: [
-                                  Image.asset("assets/icon/calendar_icon.png", height: Dimensions.iconSize16,),
-                                  SizedBox(width: Dimensions.width5,),
-                                  SizedBox(
-                                    child: Text(" Week: ",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: Dimensions.height1*7),
+                        child: Container(
+                          color: Colors.black.withOpacity(0.3),
+                          child: Padding(
+                            padding: EdgeInsets.all(Dimensions.width15),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //tournament name
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width*0.40,
+                                      child: Text(data[index]['name'],
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: Dimensions.font16,
+                                          fontWeight: FontWeight.bold,
+                                        ),),
+                                    ),
+                                    //status
+                                    Row(
+                                      children: [
+                                        Image.asset("assets/icon/status_icon.png", height: Dimensions.iconSize16,),
+                                        SizedBox(width: Dimensions.width1*2,),
+                                        SizedBox(
+                                          child: Text(" Status: ",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: Dimensions.font14,
+                                            ),),
+                                        ),
+                                        SizedBox(
+                                          child: data[index]['id']==""?Text(" Public",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: Dimensions.font14,
+                                            ),):Text(" Private",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: Dimensions.font14,
+                                            ),),
+                                        ),
+                                        SizedBox(width: Dimensions.width1*2,),
+                                        data[index]['id']!=""&&data[index]['restricted']==1
+                                            ?Icon(Icons.lock, size: Dimensions.iconSize16,):Container(),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: Dimensions.height30,),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Row(
+                                    children: [
+                                      //week
+                                      Row(
+                                        children: [
+                                          Image.asset("assets/icon/calendar_icon.png", height: Dimensions.iconSize16,),
+                                          SizedBox(width: Dimensions.width1*2,),
+                                          SizedBox(
+                                            child: Text(" Week: ",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Dimensions.font14,
+                                              ),),
+                                          ),
+                                          SizedBox(
+                                            child: Text(" ${data[index]['game_week']}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: Dimensions.font14,
+                                                  fontWeight: FontWeight.bold
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(width: Dimensions.width1*7,),
+                                      //players
+                                      Row(
+                                        children: [
+                                          Image.asset("assets/icon/people_icon.png", height: Dimensions.iconSize16,),
+                                          SizedBox(width: Dimensions.width1*2,),
+                                          SizedBox(
+                                            child: Text("Players: ",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Dimensions.font14,
+                                              ),),
+                                          ),
+                                          SizedBox(
+                                            child: Text(" ${players.length}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: Dimensions.font14,
+                                                  fontWeight: FontWeight.bold
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(width: Dimensions.width1*7,),
+                                      //fee
+                                      Row(
+                                        children: [
+                                          Image.asset("assets/icon/entry_fee_icon.png", height: Dimensions.iconSize16,),
+                                          SizedBox(width: Dimensions.width1*2,),
+                                          SizedBox(
+                                            child: Text(" Entry: ",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Dimensions.font14,
+                                              ),),
+                                          ),
+                                          SizedBox(
+                                            child: Text(" ${data[index]['entry_fee']}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: Dimensions.font14,
+                                                  fontWeight: FontWeight.bold
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(width: Dimensions.width1*7,),
+                                      //total pot
+                                      Row(
+                                        children: [
+                                          Image.asset("assets/icon/total_pot_icon.png", height: Dimensions.iconSize16,),
+                                          SizedBox(width: Dimensions.width1*2,),
+                                          SizedBox(
+                                            child: Text(" Pot: ",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Dimensions.font14,
+                                              ),),
+                                          ),
+                                          SizedBox(
+                                            child: Text(" ${data[index]['entry_fee']*players.length}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: Dimensions.font14,
+                                                  fontWeight: FontWeight.bold
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                 SizedBox(
-                                   child: Text(" ${data[index]['game_week']}",
-                                     maxLines: 1,
-                                     overflow: TextOverflow.ellipsis,
-                                     style: TextStyle(
-                                         color: Colors.white,
-                                         fontSize: Dimensions.font14,
-                                         fontWeight: FontWeight.bold
-                                     ),),
-                                 ),
-                                ],
-                              ),
-                              SizedBox(height: Dimensions.width5,),
-                              //players
-                              Row(
-                                children: [
-                                  Image.asset("assets/icon/people_icon.png", height: Dimensions.iconSize16,),
-                                  SizedBox(width: Dimensions.width5,),
-                                  SizedBox(
-                                    child: Text("Players: ",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
-                                  ),
-                                  SizedBox(
-                                    child: Text(" ${players.length}",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                          fontWeight: FontWeight.bold
-                                      ),),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: Dimensions.width5,),
-                              //fee
-                              Row(
-                                children: [
-                                  Image.asset("assets/icon/entry_fee_icon.png", height: Dimensions.iconSize16,),
-                                  SizedBox(width: Dimensions.width5,),
-                                  SizedBox(
-                                    child: Text(" Entry: ",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
-                                  ),
-                                  SizedBox(
-                                    child: Text(" ${data[index]['entry_fee']}",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                          fontWeight: FontWeight.bold
-                                      ),),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: Dimensions.width5,),
-                              //total pot
-                              Row(
-                                children: [
-                                  Image.asset("assets/icon/total_pot_icon.png", height: Dimensions.iconSize16,),
-                                  SizedBox(width: Dimensions.width1*2,),
-                                  SizedBox(
-                                    child: Text(" Pot: ",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
-                                  ),
-                                  SizedBox(
-                                    child: Text(" ${data[index]['entry_fee']*players.length}",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                          fontWeight: FontWeight.bold
-                                      ),),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: Dimensions.width5,),
-                              //status
-                              Row(
-                                children: [
-                                  Image.asset("assets/icon/status_icon.png", height: Dimensions.iconSize16,),
-                                  SizedBox(width: Dimensions.width5,),
-                                  SizedBox(
-                                    child: Text(" Status: ",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
-                                  ),
-                                  SizedBox(
-                                    child: data[index]['id']==""?Text(" Public",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),):Text(" Private",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: Dimensions.font14,
-                                      ),),
-                                  ),
-                                  SizedBox(width: Dimensions.width1*2,),
-                                  data[index]['id']!=""&&data[index]['restricted']==1
-                                      ?Icon(Icons.lock, size: Dimensions.iconSize16,):Container(),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

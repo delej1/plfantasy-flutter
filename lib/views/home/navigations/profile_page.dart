@@ -117,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               child: Container(
                 height: MediaQuery.of(context).size.height/3.5,
                 width: MediaQuery.of(context).size.width,
-                decoration: AppConstants.showImgData =="true"?BoxDecoration(
+                decoration: approved /*&& AppConstants.showImgData =="true"*/?BoxDecoration(
                   color: Colors.white54.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(Dimensions.radius20/2),
                   image: const DecorationImage(
@@ -198,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                           onTap: (){
                             hasConnection().then((_){
                               if(result){
-                                if(tokenBalance != "0" && approved && AppConstants.redeemTextString == "Redeem Tokens"){
+                                if(tokenBalance != "0" && approved /*&& AppConstants.redeemTextString == "Redeem Tokens"*/){
                                   showRedeemDialogue();
                                 }
                               }else{
@@ -227,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                                       ],
                                     ),
                                     SizedBox(height: Dimensions.height1*5,),
-                                    tokenBalance != "0" && approved && AppConstants.redeemTextString == "Redeem Tokens"?Text(AppConstants.redeemTextString,
+                                    tokenBalance != "0" && approved /*&& AppConstants.redeemTextString == "Redeem Tokens"*/?Text("Redeem Tokens",
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font10, color: Colors.yellow),)
                                         :Text("Token Balance",
                                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font10, color: Colors.yellow),
