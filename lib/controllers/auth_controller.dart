@@ -14,7 +14,7 @@ class AuthController extends GetxController{
   var isLoading = false.obs;
   var isGoogleSignInLoading = false;
 
-  void register(String email, password) async{
+  Future<void> register(String email, password) async{
     try{
       isLoading(true);
       await auth.createUserWithEmailAndPassword(email: email, password: password).then((value) => Get.offAll(()=>const LoadingScreen()));
@@ -25,7 +25,7 @@ class AuthController extends GetxController{
     }
   }
 
-  void signIn(String email, password) async{
+  Future<void> signIn(String email, password) async{
     try{
       isLoading(true);
       await auth.signInWithEmailAndPassword(email: email, password: password).then((value) => Get.offAll(()=>const LoadingScreen()));
@@ -58,7 +58,7 @@ class AuthController extends GetxController{
   //   });
   // }
 
-  void resetPassword(String email) async{
+  Future<void> resetPassword(String email) async{
     try{
       isLoading(true);
       await auth.sendPasswordResetEmail(email: email);
@@ -70,7 +70,7 @@ class AuthController extends GetxController{
     }
   }
 
-  void signOut() async{
+  Future<void> signOut() async{
     await auth.signOut();
     Get.offAll(()=>const SignInPage());
   }

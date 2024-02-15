@@ -6,9 +6,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final bool backButtonExist;
   final Function? onBackPressed;
 
-  const CustomAppBar({Key? key, required this.title,
+  const CustomAppBar({super.key, required this.title,
     this.backButtonExist=true,
-    this.onBackPressed}) : super(key: key);
+    this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       leading: backButtonExist?IconButton(
           onPressed: ()=>onBackPressed!=null?onBackPressed!()
               :Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios)):const SizedBox(),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white,)):const SizedBox(),
     );
   }
 

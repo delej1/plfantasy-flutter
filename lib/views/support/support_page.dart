@@ -11,7 +11,7 @@ import 'package:pl_fantasy_online/widgets/profile_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
 class SupportPage extends StatefulWidget {
-  const SupportPage({Key? key}) : super(key: key);
+  const SupportPage({super.key});
 
   @override
   State<SupportPage> createState() => _SupportPageState();

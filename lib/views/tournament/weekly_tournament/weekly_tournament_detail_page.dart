@@ -17,7 +17,7 @@ import 'package:pl_fantasy_online/widgets/player.dart';
 import 'package:pl_fantasy_online/widgets/sub_player.dart';
 
 class WeeklyTournamentDetailPage extends StatefulWidget {
-  const WeeklyTournamentDetailPage({Key? key}) : super(key: key);
+  const WeeklyTournamentDetailPage({super.key});
 
   @override
   State<WeeklyTournamentDetailPage> createState() => _WeeklyTournamentDetailPageState();
@@ -1285,7 +1285,7 @@ class _WeeklyTournamentDetailPageState extends State<WeeklyTournamentDetailPage>
                     "assets/image/sub_img.png", height: Dimensions.width50,),
                   SizedBox(height: Dimensions.height1 * 5,),
                   Text(
-                    "Make Sub", style: TextStyle(fontSize: Dimensions.font14),),
+                    "Make Sub", style: TextStyle(fontSize: Dimensions.font14, color: Colors.white),),
                 ],
               ),
             ),

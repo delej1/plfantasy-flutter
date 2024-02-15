@@ -13,10 +13,11 @@ import 'package:pl_fantasy_online/utils/dimensions.dart';
 import 'package:pl_fantasy_online/views/home/navigations/profile_page.dart';
 import 'package:pl_fantasy_online/views/home/navigations/tournament_category_page.dart';
 import 'package:pl_fantasy_online/views/home/navigations/welcome_page.dart';
+import 'package:pl_fantasy_online/views/tournament/weekly_tournament/weekly_tournaments_page.dart';
 
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -114,7 +115,7 @@ class _HomePageState extends State<HomePage> {
     }
     await Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (context) => const HomePage()),
+      MaterialPageRoute<void>(builder: (context) => const WeeklyTournamentsPage()),
     );
   }
 
@@ -135,7 +136,7 @@ class _HomePageState extends State<HomePage> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HomePage(),
+                  builder: (context) => const WeeklyTournamentsPage(),
                 ),
               );
             },
@@ -253,8 +254,8 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: [
                                 Image.asset("assets/icon/entry_fee_icon.png", height: Dimensions.iconSize24),
-                                isLoaded?Text(" ${data?["tokens"]}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font20),):
-                                Text("--", style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font20),),
+                                isLoaded?Text(" ${data?["tokens"]}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font20, color: Colors.white),):
+                                Text("--", style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.font20, color: Colors.white),),
                               ],
                             ),
                             IconButton(

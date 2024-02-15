@@ -14,7 +14,7 @@ import 'package:pl_fantasy_online/widgets/sub_player.dart';
 
 
 class MyTeam extends StatefulWidget {
-  const MyTeam({Key? key}) : super(key: key);
+  const MyTeam({super.key});
 
   @override
   State<MyTeam> createState() => _MyTeamState();
@@ -358,7 +358,7 @@ class _MyTeamState extends State<MyTeam> {
                 children: [
                   Image.asset("assets/image/captain_img.png", height: Dimensions.height100/2,),
                   SizedBox(height: Dimensions.height1*5,),
-                  Text("Captain", style: TextStyle(fontSize: Dimensions.font14),),
+                  Text("Captain", style: TextStyle(fontSize: Dimensions.font14, color: Colors.white),),
                 ],
               ),
             ),
@@ -382,7 +382,7 @@ class _MyTeamState extends State<MyTeam> {
                 children: [
                   Image.asset("assets/image/sub_img.png", height: Dimensions.height100/2,),
                   SizedBox(height: Dimensions.height1*5,),
-                  Text("Make Sub", style: TextStyle(fontSize: Dimensions.font14),),
+                  Text("Sub", style: TextStyle(fontSize: Dimensions.font14, color: Colors.white),),
                 ],
               ),
             ),

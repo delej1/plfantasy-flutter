@@ -250,11 +250,11 @@ class _WelcomePageState extends State<WelcomePage> with AutomaticKeepAliveClient
                         tabs: [
                           Padding(
                             padding: EdgeInsets.all(Dimensions.width8),
-                            child: Text("Current", style: TextStyle(fontSize: Dimensions.font16,)),
+                            child: Text("Current", style: TextStyle(fontSize: Dimensions.font16, color: Colors.white)),
                           ),
                           Padding(
                             padding: EdgeInsets.all(Dimensions.width8),
-                            child: Text("Upcoming", style: TextStyle(fontSize: Dimensions.font16,)),
+                            child: Text("Upcoming", style: TextStyle(fontSize: Dimensions.font16, color: Colors.white)),
                           ),
                         ],
                       ),

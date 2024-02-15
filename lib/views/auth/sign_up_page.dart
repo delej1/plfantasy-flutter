@@ -131,11 +131,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     onTap: (){
                       formCheck();
                       if(formOkay){
-                        AuthController.instance.register(emailController.text.trim(), passwordController.text.trim());
-                        Future.delayed(const Duration(seconds: 3), () {
+                        AuthController.instance.register(emailController.text.trim(), passwordController.text.trim()).then((value){
                           uploadUserData();
                           uploadUserTeamData();
                         });
+                        // Future.delayed(const Duration(seconds: 3), () {
+                        // });
                       }
                     },
                     child: Container(
