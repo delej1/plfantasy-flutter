@@ -1,16 +1,13 @@
-# pl_fantasy_online
+# Premier League Fantasy Online
 
-PL Fantasy Online
 
-## Getting Started
+![unnamed (1)](https://github.com/delej1/plfantasy-flutter/assets/99338783/2d377f68-e037-460c-909d-04e3ea49f537)
+![unnamed (2)](https://github.com/delej1/plfantasy-flutter/assets/99338783/478088ec-bd4a-46e1-b892-c6c110c53c37)
+![unnamed (3)](https://github.com/delej1/plfantasy-flutter/assets/99338783/356373a3-61e5-48e8-a68c-5ac88d8f75b0)
 
-This project is a starting point for a Flutter application.
+![unnamed](https://github.com/delej1/plfantasy-flutter/assets/99338783/152fe137-372b-4d59-9073-fad39f0656a5)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Experience the thrill of EPL Fantasy Football with our app.
+Build/import and manage your dream team of EPL players and compete against friends or other users all for fun.
+With real-time stats and exciting game modes, the competition is always on!
