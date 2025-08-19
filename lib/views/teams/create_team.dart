@@ -16,7 +16,6 @@ import 'package:pl_fantasy_online/widgets/player.dart';
 import 'package:pl_fantasy_online/widgets/sub_create_player.dart';
 import 'package:pl_fantasy_online/widgets/sub_player.dart';
 
-
 class CreateTeam extends StatefulWidget {
   const CreateTeam({Key? key}) : super(key: key);
 
@@ -25,8 +24,7 @@ class CreateTeam extends StatefulWidget {
 }
 
 class _CreateTeamState extends State<CreateTeam> {
-
-  String  alias = "";
+  String alias = "";
   num money = 0;
   int gkData = 0;
   int rbData = 0;
@@ -58,8 +56,9 @@ class _CreateTeamState extends State<CreateTeam> {
   PicksController picksController = Get.put(PicksController());
 
   //get document snapshots to check if team name exists
-  getDocumentData () async {
-    CollectionReference cat = FirebaseFirestore.instance.collection("user_teams");
+  Future<void> getDocumentData() async {
+    CollectionReference cat =
+        FirebaseFirestore.instance.collection("user_teams");
     QuerySnapshot querySnapshot = await cat.get();
     final docData = querySnapshot.docs.map((doc) => doc.data()).toList();
     for (int i = 0; i < docData.length; i++) {
@@ -70,7 +69,11 @@ class _CreateTeamState extends State<CreateTeam> {
   }
 
   void firebaseGetData() async {
-    await db.collection("user_data").doc(auth.currentUser!.uid).get().then((data){
+    await db
+        .collection("user_data")
+        .doc(auth.currentUser!.uid)
+        .get()
+        .then((data) {
       name = data["name"];
       phone = data["phone"];
       fplId = data["fpl_id"];
@@ -82,7 +85,6 @@ class _CreateTeamState extends State<CreateTeam> {
   bool isLoaded = false;
   bool formOkay = false;
 
-
   TextEditingController teamNameController = TextEditingController();
 
   @override
@@ -91,7 +93,8 @@ class _CreateTeamState extends State<CreateTeam> {
     firebaseGetData();
     getDocumentData();
 
-    _userTeamStream = db.collection("user_teams").doc(auth.currentUser?.uid).snapshots();
+    _userTeamStream =
+        db.collection("user_teams").doc(auth.currentUser?.uid).snapshots();
     teamNameController.text = "";
 
     name = "";
@@ -106,30 +109,89 @@ class _CreateTeamState extends State<CreateTeam> {
     super.dispose();
   }
 
+  Future<void> resetTeamData() async {
+    const double kStartBudget = 100.0;
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('user_teams')
+          .doc(auth.currentUser!.uid);
+
+      await FirebaseFirestore.instance.runTransaction((txn) async {
+        //final snapshot = await txn.get(docRef);
+        // Preserve fields you want to keep (e.g., alias); overwrite team + money.
+        //final existing = snapshot.data() ?? {};
+
+        final payload = <String, dynamic>{
+          // keep alias if present; comment this out if you want to clear it
+          //'alias': existing['alias'] ?? alias,
+          'money': kStartBudget,
+          'gk': 0,
+          'rb': 0,
+          'rcb': 0,
+          'lcb': 0,
+          'lb': 0,
+          'rmd': 0,
+          'md': 0,
+          'lmd': 0,
+          'rfwd': 0,
+          'fwd': 0,
+          'lfwd': 0,
+          'gk_sub': 0,
+          'def_sub': 0,
+          'mid_sub': 0,
+          'fwd_sub': 0,
+          'captain': 0,
+        };
+
+        txn.set(docRef, payload, SetOptions(merge: true));
+      });
+
+      // Local UI state so the screen reflects the reset immediately
+      setState(() {
+        money = kStartBudget;
+        gkData = rbData = rcbData = lcbData = lbData = rmdData = mdData =
+            lmdData = rfwdData = fwdData =
+                lfwdData = gkSubData = defSubData = midSubData = fwdSubData = 0;
+      });
+
+      showCustomSnackBar(
+          "Team and balance reset to ${kStartBudget.toStringAsFixed(1)}m",
+          title: "Success");
+    } catch (e) {
+      showCustomSnackBar(e.toString(), title: "Reset failed");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     List<int?>? idList;
     List<String?>? webNameList;
     List<int?>? photoList;
     List<double?>? playerPriceList;
 
-
     GeneralController generalController = Get.put(GeneralController());
 
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
-    final double fieldH = 0.6773399 * height/1.15;
+    final double fieldH = 0.6773399 * height / 1.15;
 
-    idList = generalController.generalModel?.elements!.map((info) => info.id).toList();
-    webNameList = generalController.generalModel?.elements!.map((info) => info.webName).toList();
-    photoList = generalController.generalModel?.elements!.map((info) => info.code).toList();
-    playerPriceList = generalController.generalModel?.elements!.map((info) => info.nowCost!/10).toList();
+    idList = generalController.generalModel?.elements!
+        .map((info) => info.id)
+        .toList();
+    webNameList = generalController.generalModel?.elements!
+        .map((info) => info.webName)
+        .toList();
+    photoList = generalController.generalModel?.elements!
+        .map((info) => info.code)
+        .toList();
+    playerPriceList = generalController.generalModel?.elements!
+        .map((info) => info.nowCost! / 10)
+        .toList();
 
-    final webNameMap = Map.fromIterables(idList??[], webNameList??[]);
-    final photoMap = Map.fromIterables(idList??[], photoList??[]);
-    final playerPriceMap = Map.fromIterables(idList??[], playerPriceList??[]);
-
+    final webNameMap = Map.fromIterables(idList ?? [], webNameList ?? []);
+    final photoMap = Map.fromIterables(idList ?? [], photoList ?? []);
+    final playerPriceMap =
+        Map.fromIterables(idList ?? [], playerPriceList ?? []);
 
     return Container(
       decoration: const BoxDecoration(
@@ -137,457 +199,1305 @@ class _CreateTeamState extends State<CreateTeam> {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                AppColors.gradientOne,
-                AppColors.gradientTwo,
-              ]
-          )
-      ),
+            AppColors.gradientOne,
+            AppColors.gradientTwo,
+          ])),
       child: StreamBuilder<DocumentSnapshot>(
-        stream: _userTeamStream,
-        builder: (context, snapshot) {
-          if(snapshot.hasError){
-            debugPrint("Error getting snapshot");
-          }
-          if(snapshot.connectionState == ConnectionState.waiting){
+          stream: _userTeamStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              debugPrint("Error getting snapshot");
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+            } else {
+              isLoaded = true;
+            }
+            Map<String, dynamic>? data =
+                snapshot.data?.data() as Map<String, dynamic>?;
+            alias = data?["alias"] ?? "";
+            money = data?["money"] ?? 0;
+            gkData = data?["gk"] ?? 0;
+            rbData = data?["rb"] ?? 0;
+            rcbData = data?["rcb"] ?? 0;
+            lcbData = data?["lcb"] ?? 0;
+            lbData = data?["lb"] ?? 0;
+            rmdData = data?["rmd"] ?? 0;
+            mdData = data?["md"] ?? 0;
+            lmdData = data?["lmd"] ?? 0;
+            rfwdData = data?["rfwd"] ?? 0;
+            fwdData = data?["fwd"] ?? 0;
+            lfwdData = data?["lfwd"] ?? 0;
+            gkSubData = data?["gk_sub"] ?? 0;
+            defSubData = data?["def_sub"] ?? 0;
+            midSubData = data?["mid_sub"] ?? 0;
+            fwdSubData = data?["fwd_sub"] ?? 0;
 
-          }else{
-            isLoaded = true;
-          }
-          Map<String, dynamic>? data = snapshot.data?.data() as Map<String, dynamic>?;
-          alias = data?["alias"]??"";
-          money = data?["money"]??0;
-          gkData = data?["gk"]??0;
-          rbData = data?["rb"]??0;
-          rcbData = data?["rcb"]??0;
-          lcbData = data?["lcb"]??0;
-          lbData = data?["lb"]??0;
-          rmdData = data?["rmd"]??0;
-          mdData = data?["md"]??0;
-          lmdData = data?["lmd"]??0;
-          rfwdData = data?["rfwd"]??0;
-          fwdData = data?["fwd"]??0;
-          lfwdData = data?["lfwd"]??0;
-          gkSubData = data?["gk_sub"]??0;
-          defSubData = data?["def_sub"]??0;
-          midSubData = data?["mid_sub"]??0;
-          fwdSubData = data?["fwd_sub"]??0;
+            var gk = webNameMap[gkData];
+            var rb = webNameMap[rbData];
+            var rCb = webNameMap[rcbData];
+            var lCb = webNameMap[lcbData];
+            var lb = webNameMap[lbData];
+            var rMd = webNameMap[rmdData];
+            var md = webNameMap[mdData];
+            var lMd = webNameMap[lmdData];
+            var rFwd = webNameMap[rfwdData];
+            var fwd = webNameMap[fwdData];
+            var lFwd = webNameMap[lfwdData];
+            var gkSub = webNameMap[gkSubData];
+            var defSub = webNameMap[defSubData];
+            var midSub = webNameMap[midSubData];
+            var fwdSub = webNameMap[fwdSubData];
 
-          var gk = webNameMap[gkData];
-          var rb = webNameMap[rbData];
-          var rCb = webNameMap[rcbData];
-          var lCb = webNameMap[lcbData];
-          var lb = webNameMap[lbData];
-          var rMd = webNameMap[rmdData];
-          var md = webNameMap[mdData];
-          var lMd = webNameMap[lmdData];
-          var rFwd = webNameMap[rfwdData];
-          var fwd = webNameMap[fwdData];
-          var lFwd = webNameMap[lfwdData];
-          var gkSub = webNameMap[gkSubData];
-          var defSub = webNameMap[defSubData];
-          var midSub = webNameMap[midSubData];
-          var fwdSub = webNameMap[fwdSubData];
+            var gkPhoto = photoMap[gkData];
+            var rbPhoto = photoMap[rbData];
+            var rCbPhoto = photoMap[rcbData];
+            var lCbPhoto = photoMap[lcbData];
+            var lbPhoto = photoMap[lbData];
+            var rMdPhoto = photoMap[rmdData];
+            var mdPhoto = photoMap[mdData];
+            var lMdPhoto = photoMap[lmdData];
+            var rFwdPhoto = photoMap[rfwdData];
+            var fwdPhoto = photoMap[fwdData];
+            var lFwdPhoto = photoMap[lfwdData];
+            var gkSubPhoto = photoMap[gkSubData];
+            var defSubPhoto = photoMap[defSubData];
+            var midSubPhoto = photoMap[midSubData];
+            var fwdSubPhoto = photoMap[fwdSubData];
 
-          var gkPhoto = photoMap[gkData];
-          var rbPhoto = photoMap[rbData];
-          var rCbPhoto = photoMap[rcbData];
-          var lCbPhoto = photoMap[lcbData];
-          var lbPhoto = photoMap[lbData];
-          var rMdPhoto = photoMap[rmdData];
-          var mdPhoto = photoMap[mdData];
-          var lMdPhoto = photoMap[lmdData];
-          var rFwdPhoto = photoMap[rfwdData];
-          var fwdPhoto = photoMap[fwdData];
-          var lFwdPhoto = photoMap[lfwdData];
-          var gkSubPhoto = photoMap[gkSubData];
-          var defSubPhoto = photoMap[defSubData];
-          var midSubPhoto = photoMap[midSubData];
-          var fwdSubPhoto = photoMap[fwdSubData];
+            var gkPrice = playerPriceMap[gkData];
+            var rbPrice = playerPriceMap[rbData];
+            var rCbPrice = playerPriceMap[rcbData];
+            var lCbPrice = playerPriceMap[lcbData];
+            var lbPrice = playerPriceMap[lbData];
+            var rMdPrice = playerPriceMap[rmdData];
+            var mdPrice = playerPriceMap[mdData];
+            var lMdPrice = playerPriceMap[lmdData];
+            var rFwdPrice = playerPriceMap[rfwdData];
+            var fwdPrice = playerPriceMap[fwdData];
+            var lFwdPrice = playerPriceMap[lfwdData];
+            var gkSubPrice = playerPriceMap[gkSubData];
+            var defSubPrice = playerPriceMap[defSubData];
+            var midSubPrice = playerPriceMap[midSubData];
+            var fwdSubPrice = playerPriceMap[fwdSubData];
 
-          var gkPrice = playerPriceMap[gkData];
-          var rbPrice = playerPriceMap[rbData];
-          var rCbPrice = playerPriceMap[rcbData];
-          var lCbPrice = playerPriceMap[lcbData];
-          var lbPrice = playerPriceMap[lbData];
-          var rMdPrice = playerPriceMap[rmdData];
-          var mdPrice = playerPriceMap[mdData];
-          var lMdPrice = playerPriceMap[lmdData];
-          var rFwdPrice = playerPriceMap[rfwdData];
-          var fwdPrice = playerPriceMap[fwdData];
-          var lFwdPrice = playerPriceMap[lfwdData];
-          var gkSubPrice = playerPriceMap[gkSubData];
-          var defSubPrice = playerPriceMap[defSubData];
-          var midSubPrice = playerPriceMap[midSubData];
-          var fwdSubPrice = playerPriceMap[fwdSubData];
+            selectedPlayers.clear();
+            selectedPlayers.addAll([
+              gkData,
+              rbData,
+              rcbData,
+              lcbData,
+              lbData,
+              rmdData,
+              mdData,
+              lmdData,
+              rfwdData,
+              fwdData,
+              lfwdData,
+              gkSubData,
+              defSubData,
+              midSubData,
+              fwdSubData
+            ]);
 
-          selectedPlayers.clear();
-          selectedPlayers.addAll([gkData, rbData, rcbData, lcbData, lbData, rmdData, mdData,
-              lmdData, rfwdData, fwdData, lfwdData, gkSubData, defSubData, midSubData, fwdSubData]);
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: CustomAppBar(
+                title: 'Create Team',
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    tooltip: 'Reset Team',
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Reset team?'),
+                          content: const Text(
+                            'This will clear all 15 slots, remove the captain, and reset your balance.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Reset'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        await resetTeamData();
+                      }
+                    },
+                  ),
+                ],
+              ),
+              floatingActionButton: alias == ""
+                  ? FloatingActionButton(
+                      onPressed: () {
+                        showEditNameDialogue();
+                      },
+                      tooltip: "Edit Team Name",
+                      child: const Icon(Icons.create),
+                    )
+                  : Container(),
+              body: SafeArea(
+                  child: Container(
+                margin: EdgeInsets.only(top: Dimensions.height15),
+                height: height,
+                child:
+                    ListView(physics: const BouncingScrollPhysics(), children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: Dimensions.width15,
+                        right: Dimensions.width15,
+                        bottom: Dimensions.height15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(
+                                      Dimensions.radius15 / 3),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(Dimensions.width8),
+                                  child: Text(
+                                    "Balance: ${num.parse(money.toStringAsFixed(2))}m",
+                                    style: TextStyle(
+                                        fontSize: Dimensions.font14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                )),
+                            SizedBox(
+                              height: Dimensions.width5,
+                            ),
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(
+                                      Dimensions.radius15 / 3),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(Dimensions.width8),
+                                  child: Text(
+                                    alias != "" ? alias : "Update Team Name",
+                                    style: TextStyle(
+                                        fontSize: Dimensions.font14,
+                                        color: Colors.white),
+                                  ),
+                                )),
+                          ],
+                        ),
+                        Obx(
+                          () => picksController.isLoading.value
+                              ? Container(
+                                  margin: EdgeInsets.only(
+                                      right: Dimensions.width50,
+                                      bottom: Dimensions.height10),
+                                  width: Dimensions.width20,
+                                  height: Dimensions.width20,
+                                  child: const CircularProgressIndicator(),
+                                )
+                              : GestureDetector(
+                                  onTap: () {
+                                    if (fplId.isEmpty) {
+                                      showCustomSnackBar(
+                                          "Kindly update FPL ID in account section",
+                                          title: "FPL ID");
+                                    } else {
+                                      var gkDataFpl = picksController
+                                              .picksModel?.picks![0].element ??
+                                          0;
+                                      var rbDataFpl = picksController
+                                              .picksModel?.picks![1].element ??
+                                          0;
+                                      var rcbDataFpl = picksController
+                                              .picksModel?.picks![2].element ??
+                                          0;
+                                      var lcbDataFpl = picksController
+                                              .picksModel?.picks![3].element ??
+                                          0;
+                                      var lbDataFpl = picksController
+                                              .picksModel?.picks![4].element ??
+                                          0;
+                                      var rmdDataFpl = picksController
+                                              .picksModel?.picks![5].element ??
+                                          0;
+                                      var mdDataFpl = picksController
+                                              .picksModel?.picks![6].element ??
+                                          0;
+                                      var lmdDataFpl = picksController
+                                              .picksModel?.picks![7].element ??
+                                          0;
+                                      var rfwdDataFpl = picksController
+                                              .picksModel?.picks![8].element ??
+                                          0;
+                                      var fwdDataFpl = picksController
+                                              .picksModel?.picks![9].element ??
+                                          0;
+                                      var lfwdDataFpl = picksController
+                                              .picksModel?.picks![10].element ??
+                                          0;
+                                      var gkSubDataFpl = picksController
+                                              .picksModel?.picks![11].element ??
+                                          0;
+                                      var defSubDataFpl = picksController
+                                              .picksModel?.picks![12].element ??
+                                          0;
+                                      var midSubDataFpl = picksController
+                                              .picksModel?.picks![13].element ??
+                                          0;
+                                      var fwdSubDataFpl = picksController
+                                              .picksModel?.picks![14].element ??
+                                          0;
 
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: const CustomAppBar(title: 'Create Team',),
-            floatingActionButton: alias==""?FloatingActionButton(
-              onPressed: () {
-                showEditNameDialogue();
-              },
-              tooltip: "Edit Team Name",
-              child: const Icon(Icons.create),
-            ):Container(),
-            body: SafeArea(
-                    child: Container(
-                        margin: EdgeInsets.only(top: Dimensions.height15),
-                        height: height,
-                        child: ListView(
-                            physics: const BouncingScrollPhysics(),
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: Dimensions.width15, right: Dimensions.width15, bottom: Dimensions.height15),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      bool? gkIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![0]
+                                              .isCaptain ??
+                                          false;
+                                      bool? rbIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![1]
+                                              .isCaptain ??
+                                          false;
+                                      bool? rcbIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![2]
+                                              .isCaptain ??
+                                          false;
+                                      bool? lcbIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![3]
+                                              .isCaptain ??
+                                          false;
+                                      bool? lbIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![4]
+                                              .isCaptain ??
+                                          false;
+                                      bool? rmdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![5]
+                                              .isCaptain ??
+                                          false;
+                                      bool? mdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![6]
+                                              .isCaptain ??
+                                          false;
+                                      bool? lmdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![7]
+                                              .isCaptain ??
+                                          false;
+                                      bool? rfwdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![8]
+                                              .isCaptain ??
+                                          false;
+                                      bool? fwdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![9]
+                                              .isCaptain ??
+                                          false;
+                                      bool? lfwdIsCaptain = picksController
+                                              .picksModel
+                                              ?.picks![10]
+                                              .isCaptain ??
+                                          false;
+
+                                      var gkPriceFpl =
+                                          playerPriceMap[gkDataFpl] ?? 0;
+                                      var rbPriceFpl =
+                                          playerPriceMap[rbDataFpl] ?? 0;
+                                      var rCbPriceFpl =
+                                          playerPriceMap[rcbDataFpl] ?? 0;
+                                      var lCbPriceFpl =
+                                          playerPriceMap[lcbDataFpl] ?? 0;
+                                      var lbPriceFpl =
+                                          playerPriceMap[lbDataFpl] ?? 0;
+                                      var rMdPriceFpl =
+                                          playerPriceMap[rmdDataFpl] ?? 0;
+                                      var mdPriceFpl =
+                                          playerPriceMap[mdDataFpl] ?? 0;
+                                      var lMdPriceFpl =
+                                          playerPriceMap[lmdDataFpl] ?? 0;
+                                      var rFwdPriceFpl =
+                                          playerPriceMap[rfwdDataFpl] ?? 0;
+                                      var fwdPriceFpl =
+                                          playerPriceMap[fwdDataFpl] ?? 0;
+                                      var lFwdPriceFpl =
+                                          playerPriceMap[lfwdDataFpl] ?? 0;
+                                      var gkSubPriceFpl =
+                                          playerPriceMap[gkSubDataFpl] ?? 0;
+                                      var defSubPriceFpl =
+                                          playerPriceMap[defSubDataFpl] ?? 0;
+                                      var midSubPriceFpl =
+                                          playerPriceMap[midSubDataFpl] ?? 0;
+                                      var fwdSubPriceFpl =
+                                          playerPriceMap[fwdSubDataFpl] ?? 0;
+
+                                      var gkPrice = playerPriceMap[gkData] ?? 0;
+                                      var rbPrice = playerPriceMap[rbData] ?? 0;
+                                      var rCbPrice =
+                                          playerPriceMap[rcbData] ?? 0;
+                                      var lCbPrice =
+                                          playerPriceMap[lcbData] ?? 0;
+                                      var lbPrice = playerPriceMap[lbData] ?? 0;
+                                      var rMdPrice =
+                                          playerPriceMap[rmdData] ?? 0;
+                                      var mdPrice = playerPriceMap[mdData] ?? 0;
+                                      var lMdPrice =
+                                          playerPriceMap[lmdData] ?? 0;
+                                      var rFwdPrice =
+                                          playerPriceMap[rfwdData] ?? 0;
+                                      var fwdPrice =
+                                          playerPriceMap[fwdData] ?? 0;
+                                      var lFwdPrice =
+                                          playerPriceMap[lfwdData] ?? 0;
+                                      var gkSubPrice =
+                                          playerPriceMap[gkSubData] ?? 0;
+                                      var defSubPrice =
+                                          playerPriceMap[defSubData] ?? 0;
+                                      var midSubPrice =
+                                          playerPriceMap[midSubData] ?? 0;
+                                      var fwdSubPrice =
+                                          playerPriceMap[fwdSubData] ?? 0;
+
+                                      var currentTeamPrice = gkPrice +
+                                          rbPrice +
+                                          rCbPrice +
+                                          lCbPrice +
+                                          lbPrice +
+                                          rMdPrice +
+                                          mdPrice +
+                                          lMdPrice +
+                                          rFwdPrice +
+                                          fwdPrice +
+                                          lFwdPrice +
+                                          gkSubPrice +
+                                          defSubPrice +
+                                          midSubPrice +
+                                          fwdSubPrice;
+
+                                      var fplTeamPrice = gkPriceFpl +
+                                          rbPriceFpl +
+                                          rCbPriceFpl +
+                                          lCbPriceFpl +
+                                          lbPriceFpl +
+                                          rMdPriceFpl +
+                                          mdPriceFpl +
+                                          lMdPriceFpl +
+                                          rFwdPriceFpl +
+                                          fwdPriceFpl +
+                                          lFwdPriceFpl +
+                                          gkSubPriceFpl +
+                                          defSubPriceFpl +
+                                          midSubPriceFpl +
+                                          fwdSubPriceFpl;
+
+                                      var price = (money + currentTeamPrice) -
+                                          fplTeamPrice;
+
+                                      int? captain;
+
+                                      if (gkIsCaptain) {
+                                        captain = gkDataFpl;
+                                      } else if (rbIsCaptain) {
+                                        captain = rbDataFpl;
+                                      } else if (rcbIsCaptain) {
+                                        captain = rcbDataFpl;
+                                      } else if (lcbIsCaptain) {
+                                        captain = lcbDataFpl;
+                                      } else if (lbIsCaptain) {
+                                        captain = lbDataFpl;
+                                      } else if (rmdIsCaptain) {
+                                        captain = rmdDataFpl;
+                                      } else if (mdIsCaptain) {
+                                        captain = mdDataFpl;
+                                      } else if (lmdIsCaptain) {
+                                        captain = lmdDataFpl;
+                                      } else if (rfwdIsCaptain) {
+                                        captain = rfwdDataFpl;
+                                      } else if (fwdIsCaptain) {
+                                        captain = fwdDataFpl;
+                                      } else if (lfwdIsCaptain) {
+                                        captain = lfwdDataFpl;
+                                      }
+
+                                      if (fplTeamPrice >
+                                          money + currentTeamPrice) {
+                                        showCustomSnackBar(
+                                            "Balance insufficient to import team",
+                                            title: "Oops");
+                                      } else {
+                                        uploadTeamData(
+                                            gkDataFpl,
+                                            rbDataFpl,
+                                            rcbDataFpl,
+                                            lcbDataFpl,
+                                            lbDataFpl,
+                                            rmdDataFpl,
+                                            mdDataFpl,
+                                            lmdDataFpl,
+                                            rfwdDataFpl,
+                                            fwdDataFpl,
+                                            lfwdDataFpl,
+                                            gkSubDataFpl,
+                                            defSubDataFpl,
+                                            midSubDataFpl,
+                                            fwdSubDataFpl,
+                                            price,
+                                            captain);
+                                        showCustomSnackBar(
+                                            "Process completed (or no FPL team history)",
+                                            title: "Success");
+                                      }
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: Dimensions.height25),
+                                    child: Row(
                                       children: [
-                                        Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.5),
-                                              borderRadius: BorderRadius.circular(Dimensions.radius15/3),
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(Dimensions.width8),
-                                              child: Text("Balance: ${num.parse(money.toStringAsFixed(2))}m",
-                                                style: TextStyle(fontSize: Dimensions.font14, fontWeight: FontWeight.bold, color: Colors.white),),
-                                            )
+                                        Image.asset(
+                                          'assets/image/fpl_logo.png',
+                                          width: Dimensions.width50,
                                         ),
-                                        SizedBox(height: Dimensions.width5,),
                                         Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.5),
-                                              borderRadius: BorderRadius.circular(Dimensions.radius15/3),
+                                          width: Dimensions.width20 * 6,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(
+                                                    Dimensions.radius15 / 3),
+                                                bottomRight: Radius.circular(
+                                                    Dimensions.radius15 / 3)),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(
+                                                Dimensions.width5),
+                                            child: Text(
+                                              "Import FPL Team",
+                                              style: TextStyle(
+                                                  fontSize: Dimensions.font12,
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.white),
                                             ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(Dimensions.width8),
-                                              child: Text(alias!=""?alias:"Update Team Name",
-                                                style: TextStyle(fontSize: Dimensions.font14, color: Colors.white),),
-                                            )
-                                        ),
+                                          ),
+                                        )
                                       ],
                                     ),
-                                    Obx(()=>picksController.isLoading.value? Container(
-                                      margin: EdgeInsets.only(right: Dimensions.width50, bottom: Dimensions.height10),
-                                      width:Dimensions.width20,
-                                      height: Dimensions.width20,
-                                      child: const CircularProgressIndicator(),
-                                    )
-                                        :GestureDetector(
-                                        onTap: (){
-                                          if(fplId.isEmpty){
-                                            showCustomSnackBar("Kindly update FPL ID in account section", title: "FPL ID");
-                                          }else{
-                                            var gkDataFpl = picksController.picksModel?.picks![0].element??0;
-                                            var rbDataFpl = picksController.picksModel?.picks![1].element??0;
-                                            var rcbDataFpl = picksController.picksModel?.picks![2].element??0;
-                                            var lcbDataFpl = picksController.picksModel?.picks![3].element??0;
-                                            var lbDataFpl = picksController.picksModel?.picks![4].element??0;
-                                            var rmdDataFpl = picksController.picksModel?.picks![5].element??0;
-                                            var mdDataFpl = picksController.picksModel?.picks![6].element??0;
-                                            var lmdDataFpl = picksController.picksModel?.picks![7].element??0;
-                                            var rfwdDataFpl = picksController.picksModel?.picks![8].element??0;
-                                            var fwdDataFpl = picksController.picksModel?.picks![9].element??0;
-                                            var lfwdDataFpl = picksController.picksModel?.picks![10].element??0;
-                                            var gkSubDataFpl = picksController.picksModel?.picks![11].element??0;
-                                            var defSubDataFpl = picksController.picksModel?.picks![12].element??0;
-                                            var midSubDataFpl = picksController.picksModel?.picks![13].element??0;
-                                            var fwdSubDataFpl = picksController.picksModel?.picks![14].element??0;
-
-                                            bool? gkIsCaptain = picksController.picksModel?.picks![0].isCaptain??false;
-                                            bool? rbIsCaptain = picksController.picksModel?.picks![1].isCaptain??false;
-                                            bool? rcbIsCaptain = picksController.picksModel?.picks![2].isCaptain??false;
-                                            bool? lcbIsCaptain = picksController.picksModel?.picks![3].isCaptain??false;
-                                            bool? lbIsCaptain = picksController.picksModel?.picks![4].isCaptain??false;
-                                            bool? rmdIsCaptain = picksController.picksModel?.picks![5].isCaptain??false;
-                                            bool? mdIsCaptain = picksController.picksModel?.picks![6].isCaptain??false;
-                                            bool? lmdIsCaptain = picksController.picksModel?.picks![7].isCaptain??false;
-                                            bool? rfwdIsCaptain = picksController.picksModel?.picks![8].isCaptain??false;
-                                            bool? fwdIsCaptain = picksController.picksModel?.picks![9].isCaptain??false;
-                                            bool? lfwdIsCaptain = picksController.picksModel?.picks![10].isCaptain??false;
-
-                                            var gkPriceFpl = playerPriceMap[gkDataFpl]??0;
-                                            var rbPriceFpl = playerPriceMap[rbDataFpl]??0;
-                                            var rCbPriceFpl = playerPriceMap[rcbDataFpl]??0;
-                                            var lCbPriceFpl = playerPriceMap[lcbDataFpl]??0;
-                                            var lbPriceFpl = playerPriceMap[lbDataFpl]??0;
-                                            var rMdPriceFpl = playerPriceMap[rmdDataFpl]??0;
-                                            var mdPriceFpl = playerPriceMap[mdDataFpl]??0;
-                                            var lMdPriceFpl = playerPriceMap[lmdDataFpl]??0;
-                                            var rFwdPriceFpl = playerPriceMap[rfwdDataFpl]??0;
-                                            var fwdPriceFpl = playerPriceMap[fwdDataFpl]??0;
-                                            var lFwdPriceFpl = playerPriceMap[lfwdDataFpl]??0;
-                                            var gkSubPriceFpl = playerPriceMap[gkSubDataFpl]??0;
-                                            var defSubPriceFpl = playerPriceMap[defSubDataFpl]??0;
-                                            var midSubPriceFpl = playerPriceMap[midSubDataFpl]??0;
-                                            var fwdSubPriceFpl = playerPriceMap[fwdSubDataFpl]??0;
-
-                                            var gkPrice = playerPriceMap[gkData]??0;
-                                            var rbPrice = playerPriceMap[rbData]??0;
-                                            var rCbPrice = playerPriceMap[rcbData]??0;
-                                            var lCbPrice = playerPriceMap[lcbData]??0;
-                                            var lbPrice = playerPriceMap[lbData]??0;
-                                            var rMdPrice = playerPriceMap[rmdData]??0;
-                                            var mdPrice = playerPriceMap[mdData]??0;
-                                            var lMdPrice = playerPriceMap[lmdData]??0;
-                                            var rFwdPrice = playerPriceMap[rfwdData]??0;
-                                            var fwdPrice = playerPriceMap[fwdData]??0;
-                                            var lFwdPrice = playerPriceMap[lfwdData]??0;
-                                            var gkSubPrice = playerPriceMap[gkSubData]??0;
-                                            var defSubPrice = playerPriceMap[defSubData]??0;
-                                            var midSubPrice = playerPriceMap[midSubData]??0;
-                                            var fwdSubPrice = playerPriceMap[fwdSubData]??0;
-
-                                            var currentTeamPrice = gkPrice+rbPrice+rCbPrice+lCbPrice+lbPrice
-                                                +rMdPrice+mdPrice+lMdPrice+rFwdPrice+fwdPrice+lFwdPrice
-                                                +gkSubPrice+defSubPrice+midSubPrice+fwdSubPrice;
-
-                                            var fplTeamPrice = gkPriceFpl+rbPriceFpl+rCbPriceFpl+lCbPriceFpl+lbPriceFpl
-                                                +rMdPriceFpl+mdPriceFpl+lMdPriceFpl+rFwdPriceFpl+fwdPriceFpl+lFwdPriceFpl
-                                                +gkSubPriceFpl+defSubPriceFpl+midSubPriceFpl+fwdSubPriceFpl;
-
-                                            var price = (money+currentTeamPrice)-fplTeamPrice;
-
-                                            int? captain;
-
-                                            if(gkIsCaptain){
-                                              captain = gkDataFpl;
-                                            }else if(rbIsCaptain){captain = rbDataFpl;}else if(rcbIsCaptain){captain = rcbDataFpl;}else if(lcbIsCaptain){captain = lcbDataFpl;}
-                                            else if(lbIsCaptain){captain = lbDataFpl;}else if(rmdIsCaptain){captain = rmdDataFpl;}else if(mdIsCaptain){captain = mdDataFpl;}
-                                            else if(lmdIsCaptain){captain = lmdDataFpl;}else if(rfwdIsCaptain){captain = rfwdDataFpl;}else if(fwdIsCaptain){captain = fwdDataFpl;}
-                                            else if(lfwdIsCaptain){captain = lfwdDataFpl;}
-
-
-                                            if(fplTeamPrice>money+currentTeamPrice){
-                                              showCustomSnackBar("Balance insufficient to import team", title: "Oops");
-                                            }else{
-                                              uploadTeamData(gkDataFpl,rbDataFpl,rcbDataFpl,lcbDataFpl,lbDataFpl,rmdDataFpl,
-                                                  mdDataFpl,lmdDataFpl,rfwdDataFpl,fwdDataFpl,lfwdDataFpl,
-                                                  gkSubDataFpl,defSubDataFpl,midSubDataFpl,fwdSubDataFpl,price,captain);
-                                              showCustomSnackBar("Process completed (or no FPL team history)", title: "Success");}
-                                          }},
-
-                                        child: Padding(
-                                          padding: EdgeInsets.only(bottom: Dimensions.height25),
-                                          child: Row(
-                                            children: [
-                                              Image.asset('assets/image/fpl_logo.png', width: Dimensions.width50,),
-                                              Container(
-                                                width: Dimensions.width20*6,
-                                                decoration: BoxDecoration(color: Colors.black.withOpacity(0.5),
-                                                    borderRadius: BorderRadius.only(topRight: Radius.circular(Dimensions.radius15/3),
-                                                    bottomRight: Radius.circular(Dimensions.radius15/3)),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(Dimensions.width5),
-                                                  child: Text("Import FPL Team",
-                                                    style: TextStyle(fontSize: Dimensions.font12, fontStyle: FontStyle.italic, color: Colors.white),),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                                  ),
                                 ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: Dimensions.height1 * 5),
+                  Column(
+                    children: [
+                      Stack(children: [
+                        SizedBox(
+                          height: fieldH,
+                          width: width,
+                          child: Image.asset(
+                            'assets/image/field.png',
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        gkData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_gk.png',
+                                top: 0.07272727 * fieldH,
+                                right: 0.0,
+                                left: 0.0,
+                                position: "GK",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        1,
+                                        money,
+                                        "GK",
+                                        "gk",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png',
+                                name: gk ?? "--",
+                                top: 0.07272727 * fieldH,
+                                right: 0.0,
+                                left: 0.0,
+                                position: "GK",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        1,
+                                        money,
+                                        "GK",
+                                        "gk",
+                                        gkPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
                               ),
-                              SizedBox(height: Dimensions.height1*5),
-                              Column(
-                                children: [
-                                  Stack(
-                                      children: [
-                                        SizedBox(
-                                          height: fieldH,
-                                          width: width,
-                                          child: Image.asset('assets/image/field.png', fit: BoxFit.fill,),),
-                                        gkData==0?CreatePlayer(image: 'assets/image/jersey_gk.png', top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkPhoto.png', name: gk??"--", top: 0.07272727 * fieldH, right: 0.0, left: 0.0, position: "GK", points: null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk", gkPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        rbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rb", selectedPlayers, approved]);},):
-                                        Player(image:!approved /*&&  AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png', name: rb??"--", top: 0.21818182 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rb", rbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        rcbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "rcb", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png', name: rCb??"--", top: 0.23636364 * fieldH, right: 0.29333333 * width, left: 0.0, position: "CB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "rcb", rCbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        lcbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lcb", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png', name: lCb??"--", top: 0.23636364 * fieldH, right: 0.0, left: 0.29333333 * width, position: "CB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lcb", lCbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        lbData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "lb", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png', name: lb??"--", top: 0.21818182 * fieldH,right: 0.0, left: 0.70666667 * width, position: "LB", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "lb", lbPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        rmdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "rmd", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png', name: rMd??"--", top: 0.47272727 * fieldH, right: 0.0, left: 0.70666667 * width, position: "LMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "rmd", rMdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        mdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "md", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png', name: md??"--", top: 0.45454545 * fieldH, right: 0.01333333 * width, left: 0.0, position: "AMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "md", mdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        lmdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "lmd", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png', name: lMd??"--", top: 0.47272727 * fieldH, right: 0.70666667 * width, left: 0.0, position: "RMF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "lmd", lMdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        rfwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "rfwd", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png', name: rFwd??"--", top: 0.69090909 * fieldH, right: 0.29333333 * width, left: 0.29333333 * width, position: "CF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "rfwd", rFwdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        fwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png', name: fwd??"--", top: 0.69090909 * fieldH, right: 0.5 * width, left: 0.0, position: "RWF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd", fwdPrice, selectedPlayers, approved]);}, captainBand: Container(),),
-                                        lfwdData==0?CreatePlayer(image: 'assets/image/jersey_img.png', top: 0.69090909 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF",
-                                          onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "lfwd", selectedPlayers, approved]);},):
-                                        Player(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png', name: lFwd??"--", top: 0.69090909 * fieldH, right: 0.1 * width, left: 0.65333333 * width, position: "LWF", points:null,
-                                          onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "lfwd", lFwdPrice, selectedPlayers, approved]);}, captainBand: Container(),)
-                                      ]),
-                                  Container(
-                                    width: width,
-                                    decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(Dimensions.radius20/2)
-                                    ),
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      physics: const BouncingScrollPhysics(),
-                                      reverse: true,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: Dimensions.width1*3, right: Dimensions.width1*3, top: Dimensions.height20),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SizedBox(
-                                              width: width*0.25,
-                                              child: gkSubData==0?SubCreatePlayer(image: 'assets/image/jersey_gk.png', position: "DEF",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [1, money, "GK", "gk_sub", selectedPlayers, approved]);},):
-                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png', name: gkSub??"--", position: "DEF", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [1, money, "GK", "gk_sub", gkSubPrice, selectedPlayers, approved]);},),
-                                            ),
-                                            SizedBox(width: Dimensions.width5,),
-                                            SizedBox(
-                                              width: width*0.25,
-                                              child: defSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "DEF",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [2, money, "DEF", "def_sub", selectedPlayers, approved]);},):
-                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png', name: defSub??"--", position: "DEF", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [2, money, "DEF", "def_sub", defSubPrice, selectedPlayers, approved]);},),
-                                            ),
-                                            SizedBox(width: Dimensions.width5,),
-                                            SizedBox(
-                                              width: width*0.25,
-                                              child: midSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "MID",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [3, money, "MID", "mid_sub", selectedPlayers, approved]);},):
-                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png', name: midSub??"--", position: "MID", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [3, money, "MID", "mid_sub", midSubPrice, selectedPlayers, approved]);},),
-                                            ),
-                                            SizedBox(width: Dimensions.width5,),
-                                            SizedBox(
-                                              width: width*0.25,
-                                              child: fwdSubData==0?SubCreatePlayer(image: 'assets/image/jersey_img.png', position: "FWD",
-                                                onTap: () {Get.toNamed(RouteHelper.getPickTeamPage(), arguments: [4, money, "FWD", "fwd_sub", selectedPlayers, approved]);},):
-                                              SubPlayer(image: !approved /*&& AppConstants.showImgData!="true"*/?'':'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png', name: fwdSub??"--", position: "FWD", points:null,
-                                                onTap: () {Get.toNamed(RouteHelper.getEditTeamPage(), arguments: [4, money, "FWD", "fwd_sub", fwdSubPrice, selectedPlayers, approved]);},),
-                                            ),
-                                          ],
+                        rbData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.21818182 * fieldH,
+                                right: 0.70666667 * width,
+                                left: 0.0,
+                                position: "RB",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "rb",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&&  AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rbPhoto.png',
+                                name: rb ?? "--",
+                                top: 0.21818182 * fieldH,
+                                right: 0.70666667 * width,
+                                left: 0.0,
+                                position: "RB",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "rb",
+                                        rbPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        rcbData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.23636364 * fieldH,
+                                right: 0.29333333 * width,
+                                left: 0.0,
+                                position: "CB",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "rcb",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rCbPhoto.png',
+                                name: rCb ?? "--",
+                                top: 0.23636364 * fieldH,
+                                right: 0.29333333 * width,
+                                left: 0.0,
+                                position: "CB",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "rcb",
+                                        rCbPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        lcbData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.23636364 * fieldH,
+                                right: 0.0,
+                                left: 0.29333333 * width,
+                                position: "CB",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "lcb",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lCbPhoto.png',
+                                name: lCb ?? "--",
+                                top: 0.23636364 * fieldH,
+                                right: 0.0,
+                                left: 0.29333333 * width,
+                                position: "CB",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "lcb",
+                                        lCbPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        lbData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.21818182 * fieldH,
+                                right: 0.0,
+                                left: 0.70666667 * width,
+                                position: "LB",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "lb",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lbPhoto.png',
+                                name: lb ?? "--",
+                                top: 0.21818182 * fieldH,
+                                right: 0.0,
+                                left: 0.70666667 * width,
+                                position: "LB",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        2,
+                                        money,
+                                        "DEF",
+                                        "lb",
+                                        lbPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        rmdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.47272727 * fieldH,
+                                right: 0.0,
+                                left: 0.70666667 * width,
+                                position: "LMF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "rmd",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rMdPhoto.png',
+                                name: rMd ?? "--",
+                                top: 0.47272727 * fieldH,
+                                right: 0.0,
+                                left: 0.70666667 * width,
+                                position: "LMF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "rmd",
+                                        rMdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        mdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.45454545 * fieldH,
+                                right: 0.01333333 * width,
+                                left: 0.0,
+                                position: "AMF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "md",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$mdPhoto.png',
+                                name: md ?? "--",
+                                top: 0.45454545 * fieldH,
+                                right: 0.01333333 * width,
+                                left: 0.0,
+                                position: "AMF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "md",
+                                        mdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        lmdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.47272727 * fieldH,
+                                right: 0.70666667 * width,
+                                left: 0.0,
+                                position: "RMF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "lmd",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lMdPhoto.png',
+                                name: lMd ?? "--",
+                                top: 0.47272727 * fieldH,
+                                right: 0.70666667 * width,
+                                left: 0.0,
+                                position: "RMF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        3,
+                                        money,
+                                        "MID",
+                                        "lmd",
+                                        lMdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        rfwdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.69090909 * fieldH,
+                                right: 0.29333333 * width,
+                                left: 0.29333333 * width,
+                                position: "CF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "rfwd",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$rFwdPhoto.png',
+                                name: rFwd ?? "--",
+                                top: 0.69090909 * fieldH,
+                                right: 0.29333333 * width,
+                                left: 0.29333333 * width,
+                                position: "CF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "rfwd",
+                                        rFwdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        fwdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.69090909 * fieldH,
+                                right: 0.5 * width,
+                                left: 0.0,
+                                position: "RWF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "fwd",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdPhoto.png',
+                                name: fwd ?? "--",
+                                top: 0.69090909 * fieldH,
+                                right: 0.5 * width,
+                                left: 0.0,
+                                position: "RWF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "fwd",
+                                        fwdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              ),
+                        lfwdData == 0
+                            ? CreatePlayer(
+                                image: 'assets/image/jersey_img.png',
+                                top: 0.69090909 * fieldH,
+                                right: 0.1 * width,
+                                left: 0.65333333 * width,
+                                position: "LWF",
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getPickTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "lfwd",
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                              )
+                            : Player(
+                                image: !approved /*&& AppConstants.showImgData!="true"*/
+                                    ? ''
+                                    : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$lFwdPhoto.png',
+                                name: lFwd ?? "--",
+                                top: 0.69090909 * fieldH,
+                                right: 0.1 * width,
+                                left: 0.65333333 * width,
+                                position: "LWF",
+                                points: null,
+                                onTap: () {
+                                  Get.toNamed(RouteHelper.getEditTeamPage(),
+                                      arguments: [
+                                        4,
+                                        money,
+                                        "FWD",
+                                        "lfwd",
+                                        lFwdPrice,
+                                        selectedPlayers,
+                                        approved
+                                      ]);
+                                },
+                                captainBand: Container(),
+                              )
+                      ]),
+                      Container(
+                        width: width,
+                        decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.circular(Dimensions.radius20 / 2)),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          reverse: true,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: Dimensions.width1 * 3,
+                                right: Dimensions.width1 * 3,
+                                top: Dimensions.height20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: width * 0.25,
+                                  child: gkSubData == 0
+                                      ? SubCreatePlayer(
+                                          image: 'assets/image/jersey_gk.png',
+                                          position: "DEF",
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getPickTeamPage(),
+                                                arguments: [
+                                                  1,
+                                                  money,
+                                                  "GK",
+                                                  "gk_sub",
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        )
+                                      : SubPlayer(
+                                          image: !approved /*&& AppConstants.showImgData!="true"*/
+                                              ? ''
+                                              : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$gkSubPhoto.png',
+                                          name: gkSub ?? "--",
+                                          position: "DEF",
+                                          points: null,
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getEditTeamPage(),
+                                                arguments: [
+                                                  1,
+                                                  money,
+                                                  "GK",
+                                                  "gk_sub",
+                                                  gkSubPrice,
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
                                         ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ]),
-                    )),
-          );
-        }
-      ),
+                                ),
+                                SizedBox(
+                                  width: Dimensions.width5,
+                                ),
+                                SizedBox(
+                                  width: width * 0.25,
+                                  child: defSubData == 0
+                                      ? SubCreatePlayer(
+                                          image: 'assets/image/jersey_img.png',
+                                          position: "DEF",
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getPickTeamPage(),
+                                                arguments: [
+                                                  2,
+                                                  money,
+                                                  "DEF",
+                                                  "def_sub",
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        )
+                                      : SubPlayer(
+                                          image: !approved /*&& AppConstants.showImgData!="true"*/
+                                              ? ''
+                                              : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$defSubPhoto.png',
+                                          name: defSub ?? "--",
+                                          position: "DEF",
+                                          points: null,
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getEditTeamPage(),
+                                                arguments: [
+                                                  2,
+                                                  money,
+                                                  "DEF",
+                                                  "def_sub",
+                                                  defSubPrice,
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        ),
+                                ),
+                                SizedBox(
+                                  width: Dimensions.width5,
+                                ),
+                                SizedBox(
+                                  width: width * 0.25,
+                                  child: midSubData == 0
+                                      ? SubCreatePlayer(
+                                          image: 'assets/image/jersey_img.png',
+                                          position: "MID",
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getPickTeamPage(),
+                                                arguments: [
+                                                  3,
+                                                  money,
+                                                  "MID",
+                                                  "mid_sub",
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        )
+                                      : SubPlayer(
+                                          image: !approved /*&& AppConstants.showImgData!="true"*/
+                                              ? ''
+                                              : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$midSubPhoto.png',
+                                          name: midSub ?? "--",
+                                          position: "MID",
+                                          points: null,
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getEditTeamPage(),
+                                                arguments: [
+                                                  3,
+                                                  money,
+                                                  "MID",
+                                                  "mid_sub",
+                                                  midSubPrice,
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        ),
+                                ),
+                                SizedBox(
+                                  width: Dimensions.width5,
+                                ),
+                                SizedBox(
+                                  width: width * 0.25,
+                                  child: fwdSubData == 0
+                                      ? SubCreatePlayer(
+                                          image: 'assets/image/jersey_img.png',
+                                          position: "FWD",
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getPickTeamPage(),
+                                                arguments: [
+                                                  4,
+                                                  money,
+                                                  "FWD",
+                                                  "fwd_sub",
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        )
+                                      : SubPlayer(
+                                          image: !approved /*&& AppConstants.showImgData!="true"*/
+                                              ? ''
+                                              : 'https://resources.premierleague.com/premierleague/photos/players/110x140/p$fwdSubPhoto.png',
+                                          name: fwdSub ?? "--",
+                                          position: "FWD",
+                                          points: null,
+                                          onTap: () {
+                                            Get.toNamed(
+                                                RouteHelper.getEditTeamPage(),
+                                                arguments: [
+                                                  4,
+                                                  money,
+                                                  "FWD",
+                                                  "fwd_sub",
+                                                  fwdSubPrice,
+                                                  selectedPlayers,
+                                                  approved
+                                                ]);
+                                          },
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ]),
+              )),
+            );
+          }),
     );
   }
 
   void showEditNameDialogue() {
-    showDialog(context: context, builder: (context) => AlertDialog(
-      title: const Text("Update Team Name", style: TextStyle(color: Colors.black),),
-      content: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: AppTextField(
-          textEditingController: teamNameController,
-          hintText: 'Team Name',
-          icon: Icons.edit,
-          textInputType: TextInputType.name,
-          textCapitalization: TextCapitalization.words,
-        ),
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: (){
-            Navigator.of(context).pop(false);
-            teamNameController.clear();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.mainColor,
-          ),
-          child: const Text('Close'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            teamNameFormCheck();
-            Future.delayed(const Duration(seconds: 1), (){
-              if(name.isEmpty || phone.isEmpty){
-                showCustomSnackBar("Kindly update details in account page", title: "Missing Details");
-              }else{
-                if(formOkay){
-                  try{
-                    FirebaseFirestore.instance.collection('user_teams')
-                        .doc(auth.currentUser!.uid).update({
-                      'alias': teamNameController.text.trim()})
-                        .then((_) => showCustomSnackBar(title: "Success", "Team Name Updated Successfully"));
-                  }catch(e){debugPrint(e.toString());}
-                  Navigator.of(context).pop(false);
-                  teamNameController.clear();
-                }
-              }
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.mainColor,
-          ),
-          //return false when click on "NO"
-          child: const Text('Update'),
-        ),
-      ],
-    ));
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text(
+                "Update Team Name",
+                style: TextStyle(color: Colors.black),
+              ),
+              content: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: AppTextField(
+                  textEditingController: teamNameController,
+                  hintText: 'Team Name',
+                  icon: Icons.edit,
+                  textInputType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                    teamNameController.clear();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                  ),
+                  child: const Text('Close'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    teamNameFormCheck();
+                    Future.delayed(const Duration(seconds: 1), () {
+                      if (name.isEmpty || phone.isEmpty) {
+                        showCustomSnackBar(
+                            "Kindly update details in account page",
+                            title: "Missing Details");
+                      } else {
+                        if (formOkay) {
+                          try {
+                            FirebaseFirestore.instance
+                                .collection('user_teams')
+                                .doc(auth.currentUser!.uid)
+                                .update({
+                              'alias': teamNameController.text.trim()
+                            }).then((_) => showCustomSnackBar(
+                                    title: "Success",
+                                    "Team Name Updated Successfully"));
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                          Navigator.of(context).pop(false);
+                          teamNameController.clear();
+                        }
+                      }
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                  ),
+                  //return false when click on "NO"
+                  child: const Text('Update'),
+                ),
+              ],
+            ));
   }
 
-  void teamNameFormCheck(){
+  void teamNameFormCheck() {
     String name = teamNameController.text.trim();
-    if(name.isEmpty){
+    if (name.isEmpty) {
       showCustomSnackBar("Type in your team name", title: "Team Name");
       formOkay = false;
-    }else if(name.length>20){
+    } else if (name.length > 20) {
       showCustomSnackBar("Team name too long", title: "Team Name");
       formOkay = false;
-    }else if(teamNames.contains(name.replaceAll(' ', '').toLowerCase())){
+    } else if (teamNames.contains(name.replaceAll(' ', '').toLowerCase())) {
       showCustomSnackBar("Team name already taken", title: "Team Name");
       formOkay = false;
-    }else{
+    } else {
       formOkay = true;
     }
   }
 
-  void uploadTeamData(gk,rb,rcb,lcb,lb,rmd,md,lmd,rfwd,fwd,lfwd,
-      gkSubDataFpl,defSubDataFpl,midSubDataFpl,fwdSubDataFpl,price,captain) async{
-    try{
+  void uploadTeamData(
+      gk,
+      rb,
+      rcb,
+      lcb,
+      lb,
+      rmd,
+      md,
+      lmd,
+      rfwd,
+      fwd,
+      lfwd,
+      gkSubDataFpl,
+      defSubDataFpl,
+      midSubDataFpl,
+      fwdSubDataFpl,
+      price,
+      captain) async {
+    try {
       final collection = FirebaseFirestore.instance.collection('user_teams');
       await collection.doc(auth.currentUser!.uid).update({
         'gk': gk,
@@ -608,6 +1518,8 @@ class _CreateTeamState extends State<CreateTeam> {
         'captain': captain,
         'money': price,
       });
-    }catch(e){ showCustomSnackBar(e.toString());}
+    } catch (e) {
+      showCustomSnackBar(e.toString());
+    }
   }
 }

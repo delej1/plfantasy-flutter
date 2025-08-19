@@ -12,22 +12,24 @@ import 'package:pl_fantasy_online/utils/app_constants.dart';
 import 'package:pl_fantasy_online/utils/colors.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+  const LoadingScreen({super.key});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  final InternetConnectionChecker _net = InternetConnectionChecker.instance;
 
   late String token;
   List<int?>? eventStatusList;
-  EventStatusController eventStatusController = Get.put(EventStatusController());
+  EventStatusController eventStatusController =
+      Get.put(EventStatusController());
   late String gameWeek;
 
-  Future<void> hasConnection ()async {
-    bool result = await InternetConnectionChecker().hasConnection;
-    if(result == true && token != "") {
+  Future<void> hasConnection() async {
+    bool result = await _net.hasConnection;
+    if (result == true && token != "") {
       Get.offAndToNamed(RouteHelper.getInitial());
     } else {
       Get.offAndToNamed(RouteHelper.getOfflinePage());
@@ -74,14 +76,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
     token = "";
     gameWeek = "";
-    eventStatusList = eventStatusController.eventStatusModel?.status!.map((info) => info.event).toList();
+    eventStatusList = eventStatusController.eventStatusModel?.status!
+        .map((info) => info.event)
+        .toList();
 
-    Future.delayed(const Duration(seconds: 4), () async{
+    Future.delayed(const Duration(seconds: 4), () async {
       gameWeek = (eventStatusList?.first).toString();
     }).then((value) => setState(() {
-      if(gameWeek != ""){getToken().then((_) => hasConnection());
-      } else{Get.offAndToNamed(RouteHelper.getOfflinePage());}
-    }));
+          if (gameWeek != "") {
+            getToken().then((_) => hasConnection());
+          } else {
+            Get.offAndToNamed(RouteHelper.getOfflinePage());
+          }
+        }));
 
     Get.put(FixtureController());
     Get.put(UpcomingFixtureController());
@@ -92,19 +99,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                AppColors.gradientOne,
-                AppColors.gradientTwo,
-              ]
-          )
-      ),
-      child: const Scaffold(
-        backgroundColor: Colors.transparent,
-        body: CustomLoader())
-    );
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+              AppColors.gradientOne,
+              AppColors.gradientTwo,
+            ])),
+        child: const Scaffold(
+            backgroundColor: Colors.transparent, body: CustomLoader()));
   }
 }

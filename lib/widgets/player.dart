@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 
 class Player extends StatelessWidget {
   const Player({
-    Key? key,
+    super.key,
     required this.image,
     required this.name,
     this.points,
@@ -15,8 +14,7 @@ class Player extends StatelessWidget {
     required this.position,
     this.onTap,
     required this.captainBand,
-  })  : assert(top > 0.0),
-        super(key: key);
+  }) : assert(top > 0.0);
   final String image;
   final String name;
   final int? points;
@@ -30,7 +28,7 @@ class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double _height = MediaQuery.of(context).size.height;
-    double height = 0.18181818 * (0.6773399 * _height/1.7);
+    double height = 0.18181818 * (0.6773399 * _height / 1.7);
     return Positioned(
       top: top,
       right: right,
@@ -42,9 +40,9 @@ class Player extends StatelessWidget {
           child: Column(children: [
             CachedNetworkImage(
               imageUrl: image,
-              errorWidget: (context, url, error) =>
-                  Image.asset(position!="GK"?"assets/image/jersey_img.png"
-                  :"assets/image/jersey_gk.png"),
+              errorWidget: (context, url, error) => Image.asset(position != "GK"
+                  ? "assets/image/jersey_img.png"
+                  : "assets/image/jersey_gk.png"),
               height: position == 'GK' ? height - 10.0 : height,
             ),
             SizedBox(
@@ -56,20 +54,25 @@ class Player extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          utf8.decode(name.runes.toList()),
-                          style: TextStyle(color: Colors.white, fontSize: Dimensions.font14,),
+                          name.isEmpty ? '--' : name,
+                          style: TextStyle(
+                              color: Colors.white, fontSize: Dimensions.font14),
                           textAlign: TextAlign.center,
                           maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             captainBand,
-                            SizedBox(width: Dimensions.width5,),
+                            SizedBox(
+                              width: Dimensions.width5,
+                            ),
                             Text(
-                              points!=null?points.toString():"",
-                              style: TextStyle(color: Colors.white,
+                              points != null ? points.toString() : "",
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: Dimensions.font14,
                                   fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
