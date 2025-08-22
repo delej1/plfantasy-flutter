@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
@@ -12,23 +11,22 @@ class SelectPlayerCard extends StatelessWidget {
   final Function() onPressed;
   final bool isPlayerSelected;
 
-  const SelectPlayerCard({Key? key,
-    required this.image,
-    required this.player,
-    required this.team,
-    required this.price,
-    required this.onPressed,
-    required this.position,
-    required this.isPlayerSelected
-
-  }) : super(key: key);
+  const SelectPlayerCard(
+      {super.key,
+      required this.image,
+      required this.player,
+      required this.team,
+      required this.price,
+      required this.onPressed,
+      required this.position,
+      required this.isPlayerSelected});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: Dimensions.height1*5),
+      padding: EdgeInsets.only(top: Dimensions.height1 * 5),
       child: Container(
-        height: MediaQuery.of(context).size.height*0.11,
+        height: MediaQuery.of(context).size.height * 0.11,
         width: MediaQuery.of(context).size.width,
         color: Colors.black.withOpacity(0.1),
         child: SingleChildScrollView(
@@ -42,12 +40,15 @@ class SelectPlayerCard extends StatelessWidget {
               children: [
                 CachedNetworkImage(
                   imageUrl: image,
-                  errorWidget: (context, url, error) =>
-                      Image.asset(position!="GK"?"assets/image/jersey_img.png"
-                          :"assets/image/jersey_gk.png"),
+                  errorWidget: (context, url, error) => Image.asset(
+                      position != "GK"
+                          ? "assets/image/jersey_img.png"
+                          : "assets/image/jersey_gk.png"),
                   fit: BoxFit.cover,
                 ),
-                SizedBox(width: Dimensions.width5,),
+                SizedBox(
+                  width: Dimensions.width5,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,37 +56,33 @@ class SelectPlayerCard extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(Dimensions.width8),
                       child: SizedBox(
-                        width: MediaQuery.of(context).size.width*0.35,
+                        width: MediaQuery.of(context).size.width * 0.35,
                         child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(utf8.decode(player.runes.toList()), style: TextStyle(fontSize: Dimensions.font16,
-                                  color: Colors.white),),
-                              Text(team, style: TextStyle(fontSize: Dimensions.font16, color: Colors.white),),
+                              Text(
+                                player,
+                                style: TextStyle(
+                                    fontSize: Dimensions.font16,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                team,
+                                style: TextStyle(
+                                    fontSize: Dimensions.font16,
+                                    color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(width: Dimensions.width5,),
-                    Padding(
-                      padding:  EdgeInsets.all(Dimensions.width8),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("pos.", style: TextStyle(fontSize: Dimensions.font16, fontStyle: FontStyle.italic, color: Colors.grey),),
-                            Text(position, style: TextStyle(fontSize: Dimensions.font16, color: Colors.white),),
-                          ],
-                        ),
-                      ),
+                    SizedBox(
+                      width: Dimensions.width5,
                     ),
-                    SizedBox(width: Dimensions.width5,),
                     Padding(
                       padding: EdgeInsets.all(Dimensions.width8),
                       child: SingleChildScrollView(
@@ -94,18 +91,63 @@ class SelectPlayerCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("price", style: TextStyle(fontSize: Dimensions.font16, fontStyle: FontStyle.italic, color: Colors.grey)),
-                            Text("${price}m", style: TextStyle(fontSize: Dimensions.font16, color: Colors.white),),
+                            Text(
+                              "pos.",
+                              style: TextStyle(
+                                  fontSize: Dimensions.font16,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                              position,
+                              style: TextStyle(
+                                  fontSize: Dimensions.font16,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: Dimensions.width5,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(Dimensions.width8),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("price",
+                                style: TextStyle(
+                                    fontSize: Dimensions.font16,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey)),
+                            Text(
+                              "${price}m",
+                              style: TextStyle(
+                                  fontSize: Dimensions.font16,
+                                  color: Colors.white),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(width: Dimensions.width5,),
-                !isPlayerSelected?IconButton(onPressed: onPressed,
-                    icon: Icon(Icons.add_circle,
-                      color: Colors.green, size: Dimensions.iconSize15*2,)):Container(),
+                SizedBox(
+                  width: Dimensions.width5,
+                ),
+                !isPlayerSelected
+                    ? IconButton(
+                        onPressed: onPressed,
+                        icon: Icon(
+                          Icons.add_circle,
+                          color: Colors.green,
+                          size: Dimensions.iconSize15 * 2,
+                        ))
+                    : Container(),
               ],
             ),
           ),
