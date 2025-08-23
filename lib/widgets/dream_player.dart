@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pl_fantasy_online/utils/dimensions.dart';
 
 class DreamPlayer extends StatelessWidget {
   const DreamPlayer({
-    Key? key,
+    super.key,
     required this.image,
     required this.name,
     required this.points,
@@ -13,8 +12,7 @@ class DreamPlayer extends StatelessWidget {
     required this.right,
     required this.left,
     required this.position,
-  })  : assert(top > 0.0),
-        super(key: key);
+  }) : assert(top > 0.0);
   final String image;
   final String name;
   final int points;
@@ -25,7 +23,7 @@ class DreamPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double _height = MediaQuery.of(context).size.height/2;
+    final double _height = MediaQuery.of(context).size.height / 2;
     double height = 0.18181818 * (0.6773399 * _height);
     return Positioned(
       top: top,
@@ -36,9 +34,9 @@ class DreamPlayer extends StatelessWidget {
         child: Column(children: [
           CachedNetworkImage(
             imageUrl: image,
-            errorWidget: (context, url, error) =>
-                Image.asset(position!="GK"?"assets/image/jersey_img.png"
-                :"assets/image/jersey_gk.png"),
+            errorWidget: (context, url, error) => Image.asset(position != "GK"
+                ? "assets/image/jersey_img.png"
+                : "assets/image/jersey_gk.png"),
             height: position == 'GK' ? height - 10.0 : height,
           ),
           //Image.asset(image, height: position == 'GK' ? height - 10.0 : height),
@@ -51,14 +49,18 @@ class DreamPlayer extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        utf8.decode(name.runes.toList()),
-                        style: TextStyle(color: Colors.white, fontSize: Dimensions.font14,),
+                        name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: Dimensions.font14,
+                        ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
                       ),
                       Text(
                         points.toString(),
-                        style: TextStyle(color: Colors.white,
+                        style: TextStyle(
+                            color: Colors.white,
                             fontSize: Dimensions.font14,
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
